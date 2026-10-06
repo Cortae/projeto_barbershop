@@ -1,0 +1,75 @@
+.form {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-5);
+}
+
+.colunas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--esp-6);
+}
+
+.grupo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-4);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.grupoEndereco {
+    padding-left: var(--esp-6);
+    border-left: 1px solid var(--cor-borda);
+}
+
+.legenda {
+    float: left;
+    width: 100%;
+    margin: 0 0 var(--esp-1);
+    padding: 0;
+    font-family: var(--fonte-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--cor-texto-secundario);
+}
+
+.linha {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--esp-4);
+}
+
+.linhaEstado {
+    grid-template-columns: 1fr 88px;
+}
+
+.rodape {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: var(--esp-5);
+    border-top: 1px solid var(--cor-borda);
+}
+
+@container (max-width: 600px) {
+    .colunas {
+        grid-template-columns: 1fr;
+        gap: var(--esp-5);
+    }
+
+    .grupoEndereco {
+        padding-left: 0;
+        padding-top: var(--esp-5);
+        border-left: none;
+        border-top: 1px solid var(--cor-borda);
+    }
+
+    .rodape > button {
+        flex: 1;
+    }
+}

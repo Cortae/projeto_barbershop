@@ -1,0 +1,56 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-4);
+    padding: var(--esp-5) var(--esp-5) var(--esp-4);
+}
+
+.cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--esp-3);
+}
+
+.nome {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--cor-texto);
+    overflow-wrap: anywhere;
+}
+
+.valores {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: auto;
+}
+
+.preco {
+    margin: 0;
+    font-family: var(--fonte-mono);
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--cor-texto);
+}
+
+.estoque {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--cor-texto-secundario);
+}
+
+.acoes {
+    display: flex;
+    gap: var(--esp-2);
+    padding-top: var(--esp-4);
+    border-top: 1px solid var(--cor-borda);
+}
+
+.acoes > button {
+    flex: 1;
+    padding: 0 var(--esp-3);
+}

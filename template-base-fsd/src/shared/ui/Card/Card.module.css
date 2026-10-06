@@ -1,0 +1,20 @@
+.card {
+    border-radius: var(--raio);
+    padding: var(--esp-5);
+}
+
+.light {
+    background-color: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    box-shadow: var(--sombra-card);
+}
+
+.navy {
+    background-color: var(--cor-marinho);
+    color: #FFFFFF;
+}
+
+.soft {
+    background-color: var(--cor-superficie);
+    border: 1px dashed var(--cor-borda-forte);
+}

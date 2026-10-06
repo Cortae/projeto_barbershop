@@ -1,0 +1,43 @@
+.secao {
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-4);
+}
+
+.cabecalhoSecao {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-3);
+}
+
+.tituloSecao {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.grade {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--esp-4);
+}
+
+.estado {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--cor-texto-secundario);
+}
+
+.estadoVazio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--esp-1);
+    padding: var(--esp-7) var(--esp-5);
+    text-align: center;
+}
+
+.estadoVazioTitulo {
+    margin: 0;
+    font-weight: 600;
+}
