@@ -1,39 +1,29 @@
-import { useEffect, useId } from "react"
-import styles from "./Modal.module.css"
+import { useId } from 'react'
+import { useDialog } from './useDialog'
 
-export function Modal(props) {
-    const idTitulo = useId()
-    const tamanho = props.tamanho === "grande" ? styles.grande : ""
-
-    useEffect(() => {
-        function aoTeclar(evento) {
-            if (evento.key === "Escape") props.onFechar()
-        }
-        document.addEventListener("keydown", aoTeclar)
-        return () => document.removeEventListener("keydown", aoTeclar)
-    }, [props.onFechar])
-
-    return (
-        <div className={styles.sobreposicao} onClick={props.onFechar}>
-            <div
-                className={`${styles.modal} ${tamanho}`}
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby={idTitulo}
-                onClick={(evento) => evento.stopPropagation()}
-            >
-                <div className={styles.cabecalho}>
-                    <h2 id={idTitulo} className={styles.titulo}>{props.titulo}</h2>
-                    <button type="button" className={styles.fechar} onClick={props.onFechar} aria-label="Fechar">
-                        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-                            <path d="M3.5 3.5l9 9m0-9l-9 9" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-                        </svg>
-                    </button>
-                </div>
-                <div className={styles.conteudo}>
-                    {props.children}
-                </div>
-            </div>
-        </div>
-    )
+export default function Modal({ open, onClose, title, description, children }) {
+  const ref = useDialog(open, onClose, '[data-autofocus]')
+  const titleId = useId()
+  if (!open) return null
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <button
+        type="button"
+        aria-label="Fechar modal"
+        className="absolute inset-0 bg-fundo/60"
+        onClick={onClose}
+      />
+      <div
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="relative z-10 w-full max-w-sm rounded-12 border border-borda bg-superficie p-4"
+      >
+        <h2 id={titleId} className="texto-h3">{title}</h2>
+        {description && <p className="mt-2 text-texto-secundario">{description}</p>}
+        <div className="mt-6 flex flex-col gap-3">{children}</div>
+      </div>
+    </div>
+  )
 }

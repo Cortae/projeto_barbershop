@@ -1,15 +1,10 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
-import { ProdutosPagina } from "../pages/produtos/ProdutosPagina"
+import Providers from './providers'
+import AppRouter from './router'
 
-function App() {
-
+export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<ProdutosPagina />} />
-      </Routes>
-    </BrowserRouter>
+    <Providers>
+      <AppRouter />
+    </Providers>
   )
 }
-
-export default App
