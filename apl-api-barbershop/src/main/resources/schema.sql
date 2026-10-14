@@ -252,9 +252,9 @@ INSERT INTO expediente
                                                                                                                      (13, 6, 3, TRUE, TIME '09:00:00', TIME '15:00:00', NULL, NULL),
                                                                                                                      (14, 7, 3, FALSE, NULL, NULL, NULL, NULL);
 
-INSERT INTO bloqueio (id_bloqueio, fk_usuario, inicio, fim, motivo) VALUES
-                                                                        (1, 2, TIMESTAMP '2026-10-12 15:00:00', TIMESTAMP '2026-10-12 16:00:00', 'Compromisso pessoal'),
-                                                                        (2, 3, TIMESTAMP '2026-10-13 12:00:00', TIMESTAMP '2026-10-13 13:00:00', 'Pausa excepcional');
+INSERT INTO bloqueio (fk_usuario, inicio, fim, motivo) VALUES
+                                                            (2, TIMESTAMP '2026-10-12 15:00:00', TIMESTAMP '2026-10-12 16:00:00', 'Compromisso pessoal'),
+                                                            (3, TIMESTAMP '2026-10-13 12:00:00', TIMESTAMP '2026-10-13 13:00:00', 'Pausa excepcional');
 
 INSERT INTO despesa (id_despesa, fk_usuario, descricao, valor, data_despesa) VALUES
                                                                                  (1, 1, 'Compra de lâminas e navalhas', 120.50, DATE '2026-10-02'),
