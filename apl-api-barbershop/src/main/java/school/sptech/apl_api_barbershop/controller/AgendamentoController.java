@@ -93,7 +93,7 @@ public class AgendamentoController {
     public ResponseEntity<List<Agendamento>> buscarAgendamentosPorCliente(@PathVariable Integer id){
 
         if(agendamentoService.existeCliente(id) == false){
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.ok().body(agendamentoService.buscarAgendamentosPorCliente(id));
