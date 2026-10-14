@@ -2,6 +2,8 @@ package school.sptech.apl_api_barbershop.repository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import school.sptech.apl_api_barbershop.entity.Agendamento;
 
 import java.time.LocalDateTime;
@@ -16,7 +18,17 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Intege
 
     List<Agendamento> findByHorarioInicioBetweenOrderByHorarioInicioAsc(LocalDateTime inicio, LocalDateTime fim);
 
-    Boolean existsAgendamentosByHorarioInicioAndBarbeiroId(LocalDateTime horario, Integer id);
+    @Query("""
+    SELECT COUNT(a) > 0
+    FROM Agendamento a
+    WHERE a.horarioInicio = :horario
+      AND a.barbeiro.id = :barbeiroId
+      AND a.statusAgendamento.titulo NOT IN ('CANCELADO', 'CONCLUIDO', 'NAO_COMPARECEU')
+""")
+    boolean existeAgendamentoAtivo(
+            @Param("horario") LocalDateTime horario,
+            @Param("barbeiroId") Integer barbeiroId
+    );
 
     List<Agendamento> findByClienteId(Integer id);
 }

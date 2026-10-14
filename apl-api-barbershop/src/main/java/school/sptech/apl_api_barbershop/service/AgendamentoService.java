@@ -87,7 +87,7 @@ public class AgendamentoService {
 
     public Agendamento cadastrar(@Valid AgendamentoCadastroRequestDto agendamentoDto) {
 
-        if(agendamentoRepository.existsAgendamentosByHorarioInicioAndBarbeiroId(agendamentoDto.getInicio(), agendamentoDto.getBarbeiro())){
+        if(agendamentoRepository.existeAgendamentoAtivo(agendamentoDto.getInicio(), agendamentoDto.getBarbeiro())){
             throw new ResponseStatusException( HttpStatus.CONFLICT, "Horário já ocupado");
         }
 
@@ -182,7 +182,7 @@ public class AgendamentoService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Agendamento não encontrado");
         }
 
-        if(agendamentoRepository.existsAgendamentosByHorarioInicioAndBarbeiroId(request.getInicio(), request.getIdAgendamento())){
+        if(agendamentoRepository.existeAgendamentoAtivo(request.getInicio(), request.getIdAgendamento())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Horário já ocupado para esse barbeiro.");
         }
 
@@ -197,6 +197,6 @@ public class AgendamentoService {
     }
 
     public boolean validarDisponibilidade(LocalDateTime horarioInicio, Integer idBarbeiro){
-        return agendamentoRepository.existsAgendamentosByHorarioInicioAndBarbeiroId(horarioInicio, idBarbeiro);
+        return agendamentoRepository.existeAgendamentoAtivo(horarioInicio, idBarbeiro);
     }
 }
