@@ -16,7 +16,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Intege
 
     List<Agendamento> findByHorarioInicioBetweenOrderByHorarioInicioAsc(LocalDateTime inicio, LocalDateTime fim);
 
-    Boolean existsAgendamentosByHorarioInicio(LocalDateTime horario);
+    Boolean existsAgendamentosByHorarioInicioAndBarbeiroId(LocalDateTime horario, Integer id);
 
     List<Agendamento> findByClienteId(Integer id);
 }

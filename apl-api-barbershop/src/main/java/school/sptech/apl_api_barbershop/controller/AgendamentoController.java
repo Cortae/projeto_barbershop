@@ -2,10 +2,13 @@ package school.sptech.apl_api_barbershop.controller;
 
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.apl_api_barbershop.dto.AgendamentoCadastroRequestDto;
+import school.sptech.apl_api_barbershop.dto.AtualizarServicosAgendamentoRequestDto;
+import school.sptech.apl_api_barbershop.dto.RemarcarAgendamentoRequestDto;
 import school.sptech.apl_api_barbershop.entity.Agendamento;
 import school.sptech.apl_api_barbershop.repository.AgendamentoRepository;
 import school.sptech.apl_api_barbershop.service.AgendamentoService;
@@ -18,7 +21,7 @@ import java.util.Optional;
 @RequestMapping("/agendamentos")
 public class AgendamentoController {
 
-    private AgendamentoService agendamentoService;
+    private final AgendamentoService agendamentoService;
 
     public AgendamentoController( AgendamentoService agendamentoService){
         this.agendamentoService = agendamentoService;
@@ -47,6 +50,18 @@ public class AgendamentoController {
     public ResponseEntity<Void> concluirAgendamento(@PathVariable Integer id){
         agendamentoService.concluir(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/servicos")
+    public ResponseEntity<Agendamento> atualizarServicosAgendamento(@RequestBody @Valid AtualizarServicosAgendamentoRequestDto request){
+
+        return ResponseEntity.ok().body(agendamentoService.atualizarServicosAgendamento(request));
+    }
+
+    @PatchMapping("/horario")
+    public ResponseEntity<Agendamento> remarcarAgendamento(@RequestBody @Valid RemarcarAgendamentoRequestDto request){
+
+       return ResponseEntity.ok().body(agendamentoService.remarcarAgendamento(request));
     }
 
     @GetMapping("/periodo/")

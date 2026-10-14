@@ -1,10 +1,13 @@
 package school.sptech.apl_api_barbershop.service;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import school.sptech.apl_api_barbershop.dto.AgendamentoCadastroRequestDto;
+import school.sptech.apl_api_barbershop.dto.AtualizarServicosAgendamentoRequestDto;
+import school.sptech.apl_api_barbershop.dto.RemarcarAgendamentoRequestDto;
 import school.sptech.apl_api_barbershop.entity.*;
 import school.sptech.apl_api_barbershop.repository.*;
 
@@ -20,13 +23,13 @@ import java.util.Optional;
 public class AgendamentoService {
 
 
-    private AgendamentoRepository agendamentoRepository;
-    private ServicoRepository servicoRepository;
-    private StatusAgendamentoRepository statusAgendamentoRepository;
-    private ClienteRepository clienteRepository;
-    private PagamentoService pagamentoService;
-    private UsuarioRepository usuarioRepository;
-    private AgendamentoServicoService agendamentoServicoService;
+    private final AgendamentoRepository agendamentoRepository;
+    private final ServicoRepository servicoRepository;
+    private final StatusAgendamentoRepository statusAgendamentoRepository;
+    private final ClienteRepository clienteRepository;
+    private final PagamentoService pagamentoService;
+    private final UsuarioRepository usuarioRepository;
+    private final AgendamentoServicoService agendamentoServicoService;
 
     public AgendamentoService(AgendamentoRepository agendamentoRepository,
                               ServicoRepository servicoRepository,
@@ -84,7 +87,7 @@ public class AgendamentoService {
 
     public Agendamento cadastrar(@Valid AgendamentoCadastroRequestDto agendamentoDto) {
 
-        if(agendamentoRepository.existsAgendamentosByHorarioInicio(agendamentoDto.getInicio())){
+        if(agendamentoRepository.existsAgendamentosByHorarioInicioAndBarbeiroId(agendamentoDto.getInicio(), agendamentoDto.getBarbeiro())){
             throw new ResponseStatusException( HttpStatus.CONFLICT, "Horário já ocupado");
         }
 
@@ -151,5 +154,49 @@ public class AgendamentoService {
                 cliente.get(),
                 pagamento
         );
+    }
+
+    public Agendamento atualizarServicosAgendamento(AtualizarServicosAgendamentoRequestDto request) {
+
+        Optional<Agendamento> agendamento = agendamentoRepository.findById(request.getIdAgendamento());
+
+        if(agendamento.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Agendamento não encontrado");
+        }
+
+        List<Servico> servicos = buscarServicosRelacionados(request.getServicos());
+
+        if(servicos.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nenhum serviço válido");
+        }
+
+        agendamentoServicoService.atualizarServicos(agendamento.get(), servicos);
+
+        return agendamentoRepository.findById(request.getIdAgendamento()).get();
+
+    }
+
+    public Agendamento remarcarAgendamento(@Valid RemarcarAgendamentoRequestDto request) {
+
+        if(!usuarioRepository.existsById(request.getIdAgendamento())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Agendamento não encontrado");
+        }
+
+        if(agendamentoRepository.existsAgendamentosByHorarioInicioAndBarbeiroId(request.getInicio(), request.getIdAgendamento())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Horário já ocupado para esse barbeiro.");
+        }
+
+        Agendamento agendamento = agendamentoRepository.findById(request.getIdAgendamento()).get();
+
+        Integer duracaoMinutos = (agendamento.getHorarioFim().getMinute() - agendamento.getHorarioInicio().getMinute());
+
+        agendamento.setHorarioInicio(request.getInicio());
+        agendamento.setHorarioFim(agendamento.getHorarioInicio().plusMinutes(duracaoMinutos));
+
+        return agendamentoRepository.save(agendamento);
+    }
+
+    public boolean validarDisponibilidade(LocalDateTime horarioInicio, Integer idBarbeiro){
+        return agendamentoRepository.existsAgendamentosByHorarioInicioAndBarbeiroId(horarioInicio, idBarbeiro);
     }
 }

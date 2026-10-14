@@ -12,13 +12,9 @@ import java.util.List;
 @Service
 public class AgendamentoServicoService {
 
-    private AgendamentoServicoRepository agendamentoServicoRepository;
-
-    private ServicoRepository servicoRepository;
-
-    public AgendamentoServicoService(AgendamentoServicoRepository agendamentoServicoRepository, ServicoRepository servicoRepository) {
+    private final AgendamentoServicoRepository agendamentoServicoRepository;
+    public AgendamentoServicoService(AgendamentoServicoRepository agendamentoServicoRepository) {
         this.agendamentoServicoRepository = agendamentoServicoRepository;
-        this.servicoRepository = servicoRepository;
     }
 
     public void vincularAgendamentoServico(Agendamento agendamento, List<Servico> servicos){
@@ -34,5 +30,15 @@ public class AgendamentoServicoService {
             ));
         }
 
+    }
+
+
+    public void atualizarServicos(Agendamento agendamento, List<Servico> servicos){
+
+        if(agendamentoServicoRepository.existsByAgendamentoIdAgendamento(agendamento.getIdAgendamento())){
+            agendamentoServicoRepository.deleteByAgendamentoIdAgendamento(agendamento.getIdAgendamento());
+        }
+
+        atualizarServicos(agendamento, servicos);
     }
 }
