@@ -15,7 +15,7 @@ public class Agendamento {
     private String titulo;
 
     @ManyToOne
-    @Column(name = "fk_status_agendamento")
+    @JoinColumn(name = "fk_status_agendamento")
     private StatusAgendamento statusAgendamento;
 
     @ManyToOne
