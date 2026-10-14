@@ -10,7 +10,7 @@ public class AgendamentoServico {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idAgendamentoServicos;
+    private Integer idAgendamentoServico;
 
     @ManyToOne
     @JoinColumn(name = "fk_agendamento")
@@ -25,8 +25,8 @@ public class AgendamentoServico {
 
     public AgendamentoServico(){}
 
-    public AgendamentoServico(Integer idAgendamentoServicos, Agendamento agendamento, Servico servico, BigDecimal valorUnitario, Integer duracao) {
-        this.idAgendamentoServicos = idAgendamentoServicos;
+    public AgendamentoServico(Integer idAgendamentoServico, Agendamento agendamento, Servico servico, BigDecimal valorUnitario, Integer duracao) {
+        this.idAgendamentoServico = idAgendamentoServico;
         this.agendamento = agendamento;
         this.servico = servico;
         this.valorUnitario = valorUnitario;
@@ -34,11 +34,11 @@ public class AgendamentoServico {
     }
 
     public Integer getIdAgendamentoServicos() {
-        return idAgendamentoServicos;
+        return idAgendamentoServico;
     }
 
     public void setIdAgendamentoServicos(Integer idAgendamentoServicos) {
-        this.idAgendamentoServicos = idAgendamentoServicos;
+        this.idAgendamentoServico = idAgendamentoServicos;
     }
 
     public Agendamento getAgendamento() {

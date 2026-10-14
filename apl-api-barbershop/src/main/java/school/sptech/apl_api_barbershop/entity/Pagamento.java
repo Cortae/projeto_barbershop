@@ -31,19 +31,17 @@ public class Pagamento {
     @JoinColumn(name =  "fk_forma_pagamento")
     private FormaPagamento formaPagamento;
 
-    @OneToMany(mappedBy = "pagamento")
-    private List<Agendamento> agendamentos;
+
 
 
     public Pagamento(){}
 
-    public Pagamento(Integer id, BigDecimal valor, boolean pago, LocalDateTime dataPagamento, FormaPagamento formaPagamento, List<Agendamento> agendamentos) {
+    public Pagamento(Integer id, BigDecimal valor, boolean pago, LocalDateTime dataPagamento, FormaPagamento formaPagamento) {
         this.id = id;
         this.valor = valor;
         this.pago = pago;
         this.dataPagamento = dataPagamento;
         this.formaPagamento = formaPagamento;
-        this.agendamentos = agendamentos;
     }
 
     public Integer getId() {
@@ -86,11 +84,4 @@ public class Pagamento {
         this.formaPagamento = formaPagamento;
     }
 
-    public List<Agendamento> getAgendamentos() {
-        return agendamentos;
-    }
-
-    public void setAgendamentos(List<Agendamento> agendamentos) {
-        this.agendamentos = agendamentos;
-    }
 }

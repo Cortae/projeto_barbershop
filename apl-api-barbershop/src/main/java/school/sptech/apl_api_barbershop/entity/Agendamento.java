@@ -26,13 +26,22 @@ public class Agendamento {
     @JoinColumn(name = "fk_cliente")
     private Cliente cliente;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "fk_pagamento")
     private Pagamento pagamento;
 
     public Agendamento(){}
 
-
+    public Agendamento(Integer idAgendamento, LocalDateTime horarioInicio, LocalDateTime horarioFim, String titulo, StatusAgendamento statusAgendamento, Usuario barbeiro, Cliente cliente, Pagamento pagamento) {
+        this.idAgendamento = idAgendamento;
+        this.horarioInicio = horarioInicio;
+        this.horarioFim = horarioFim;
+        this.titulo = titulo;
+        this.statusAgendamento = statusAgendamento;
+        this.barbeiro = barbeiro;
+        this.cliente = cliente;
+        this.pagamento = pagamento;
+    }
 
     public Integer getIdAgendamento() {
         return idAgendamento;
