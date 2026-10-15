@@ -1,0 +1,72 @@
+
+package school.sptech.apl_api_barbershop.controller;
+
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import school.sptech.apl_api_barbershop.dto.ClienteRequest;
+import school.sptech.apl_api_barbershop.dto.ClienteResponse;
+import school.sptech.apl_api_barbershop.dto.ClienteItemResponse;
+import school.sptech.apl_api_barbershop.service.ClienteService;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping("/clientes")
+public class ClienteController {
+
+    private final ClienteService service;
+
+    public ClienteController(ClienteService service) {
+        this.service = service;
+    }
+
+    @PostMapping
+    public ResponseEntity<ClienteResponse> cadastrar(
+            @Valid @RequestBody ClienteRequest request) {
+
+        ClienteResponse cliente = service.cadastrar(request);
+
+        URI uri = URI.create("/clientes/" + cliente.id());
+
+        return ResponseEntity.created(uri).body(cliente);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ClienteResponse> editar(
+            @PathVariable Integer id,
+            @Valid @RequestBody ClienteRequest request) {
+
+        ClienteResponse cliente = service.editar(id, request);
+
+        if (cliente == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(cliente);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ClienteItemResponse>> listar(
+            @RequestParam(required = false) String busca) {
+
+        List<ClienteItemResponse> clientes = service.listar(busca);
+
+        return ResponseEntity.ok(clientes);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClienteResponse> buscar(
+            @PathVariable Integer id) {
+
+        ClienteResponse cliente = service.buscar(id);
+
+        if (cliente == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(cliente);
+    }
+}
