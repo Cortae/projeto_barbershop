@@ -2,6 +2,7 @@ package school.sptech.apl_api_barbershop.controller;
 
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -42,9 +43,15 @@ public class AgendamentoController {
     }
 
     @PatchMapping("/cancelar/{id}")
-    public ResponseEntity<Void> cancelarAgendamento(@PathVariable Integer id){
-        agendamentoService.atualizarStatus(id, "CANCELADO");
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Agendamento> cancelarAgendamento(@PathVariable Integer id){
+        return ResponseEntity.ok().body(agendamentoService.atualizarStatus(id, "CANCELADO"));
+    }
+
+    @PatchMapping("/atualizar-status/{id}")
+    public ResponseEntity<Agendamento> confirmarAgendamento(
+            @PathVariable Integer id,
+            @RequestParam(required = true) @Valid @NotBlank String status){
+        return ResponseEntity.ok().body(agendamentoService.atualizarStatus(id, status));
     }
 
     @PatchMapping("/concluir/{id}")

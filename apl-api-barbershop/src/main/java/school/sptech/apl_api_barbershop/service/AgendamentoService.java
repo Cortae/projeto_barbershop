@@ -26,7 +26,7 @@ public class AgendamentoService {
 
     private final AgendamentoRepository agendamentoRepository;
     private final ServicoRepository servicoRepository;
-    private final StatusAgendamentoRepository statusAgendamentoRepository;
+    private final StatusAgendamentoService statusAgendamentoService;
     private final ClienteRepository clienteRepository;
     private final PagamentoService pagamentoService;
     private final UsuarioRepository usuarioRepository;
@@ -34,14 +34,14 @@ public class AgendamentoService {
 
     public AgendamentoService(AgendamentoRepository agendamentoRepository,
                               ServicoRepository servicoRepository,
-                              StatusAgendamentoRepository statusAgendamentoRepository,
+                              StatusAgendamentoService statusAgendamentoService,
                               ClienteRepository clienteRepository,
                               PagamentoService pagamentoService,
                               UsuarioRepository usuarioRepository,
                               AgendamentoServicoService agendamentoServicoService) {
         this.agendamentoRepository = agendamentoRepository;
         this.servicoRepository = servicoRepository;
-        this.statusAgendamentoRepository = statusAgendamentoRepository;
+        this.statusAgendamentoService = statusAgendamentoService;
         this.clienteRepository = clienteRepository;
         this.pagamentoService = pagamentoService;
         this.usuarioRepository = usuarioRepository;
@@ -57,8 +57,11 @@ public class AgendamentoService {
         if(!existeAgendamento(id)){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento não encontrado.");
         }
+        if(!statusAgendamentoService.existeStatusContaining(acao)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status não permitido.");
+        }
 
-        StatusAgendamento status = statusAgendamentoRepository.findByTituloContainingIgnoreCase(acao);
+        StatusAgendamento status = statusAgendamentoService.buscaStatus(acao);
         Agendamento agendamento = agendamentoRepository.findById(id).get();
 
         agendamento.setStatusAgendamento(status);
@@ -154,7 +157,7 @@ public class AgendamentoService {
         Pagamento pagamento = pagamentoService.registrar(valorTotal);
 
         LocalDateTime fimAtendimento = agendamento.getInicio().plusMinutes((long) duracaoTotal);
-        StatusAgendamento status = statusAgendamentoRepository.findByTituloContainingIgnoreCase("agendado");
+        StatusAgendamento status = statusAgendamentoService.buscaStatus("agendado");
         String titulo = cliente.get().getNome() + " - Duração: "+ duracaoTotal+ "min";
 
 
