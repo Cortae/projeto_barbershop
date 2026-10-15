@@ -4,10 +4,10 @@ import { Search, AlertCircle } from 'lucide-react'
 export default function ClientCombobox({ clients, value, onChange, error, disabled }) {
   const id = useId()
   const selected = clients.find((c) => c.id === value)
-  const [query, setQuery] = useState(selected?.name ?? '')
+  const [query, setQuery] = useState(selected?.nome ?? '')
   const [open, setOpen] = useState(false)
   const q = query.trim().toLowerCase()
-  const matches = clients.filter((c) => c.name.toLowerCase().includes(q) || c.phone.includes(q)).slice(0, 6)
+  const matches = clients.filter((c) => c.nome.toLowerCase().includes(q) || c.telefone.includes(q)).slice(0, 6)
 
   return (
     <div className="relative flex flex-col gap-2">
@@ -46,12 +46,12 @@ export default function ClientCombobox({ clients, value, onChange, error, disabl
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
                   onChange(c.id)
-                  setQuery(c.name)
+                  setQuery(c.nome)
                   setOpen(false)
                 }}
               >
-                <span>{c.name}</span>
-                <span className="texto-corpo-pequeno text-texto-secundario">{c.phone}</span>
+                <span>{c.nome}</span>
+                <span className="texto-corpo-pequeno text-texto-secundario">{c.telefone}</span>
               </button>
             </li>
           ))}

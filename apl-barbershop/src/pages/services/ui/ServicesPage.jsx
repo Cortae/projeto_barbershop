@@ -22,7 +22,7 @@ export default function ServicesPage() {
           <ul className="grid gap-3 lg:grid-cols-2">
             {data.map((s) => (
               <li key={s.id}>
-                <ServiceCard service={s} action={<Button variant="icon" size="icon" icon={Pencil} aria-label={`Editar ${s.name}`} onClick={() => setEditing(s)} />} />
+                <ServiceCard service={s} action={<Button variant="icon" size="icon" icon={Pencil} aria-label={`Editar ${s.nome}`} onClick={() => setEditing(s)} />} />
               </li>
             ))}
           </ul>

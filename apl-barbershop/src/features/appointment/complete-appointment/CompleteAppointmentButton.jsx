@@ -9,7 +9,7 @@ export default function CompleteAppointmentButton({ appointmentId, onDone }) {
   const [status, setStatus] = useState('pago')
   const [method, setMethod] = useState('pix')
   const mutation = useAppMutation({
-    mutationFn: () => completeAppointment(appointmentId, { paymentStatus: status, paymentMethod: method }),
+    mutationFn: () => completeAppointment(appointmentId, { statusPagamento: status, formaPagamento: method }),
     invalidate: ['appointments', 'clients', 'finance'],
     successMessage: status === 'pago' ? 'Atendimento concluído e pago.' : 'Atendimento concluído. Pagamento pendente.',
     onSuccess: onDone,

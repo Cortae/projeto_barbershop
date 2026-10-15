@@ -25,7 +25,7 @@ export function DayGrid({ date, hours, appointments, blocks, onBlock }) {
     return (
       <EmptyState icon={CalendarX} title="Fora do expediente" text="A barbearia não abre neste dia. Ajuste o expediente pelo menu ⋯ se precisar." />
     )
-  const hasAppts = slots.some((s) => s.state === 'ocupado')
+  const hasAppts = slots.some((s) => s.estado === 'ocupado')
   return (
     <div className="flex flex-col gap-4">
       {!hasAppts && (
@@ -40,35 +40,35 @@ export function DayGrid({ date, hours, appointments, blocks, onBlock }) {
       )}
       <ol className="flex flex-col gap-2">
         {slots.map((s) => (
-          <li key={s.time} className="flex gap-3" style={{ minHeight: s.span * ROW - 8 }}>
-            <span className="texto-corpo-pequeno w-12 shrink-0 pt-3 tabular-nums text-texto-secundario">{s.time}</span>
-            {s.state === 'livre' && (
+          <li key={s.horario} className="flex gap-3" style={{ minHeight: s.intervalos * ROW - 8 }}>
+            <span className="texto-corpo-pequeno w-12 shrink-0 pt-3 tabular-nums text-texto-secundario">{s.horario}</span>
+            {s.estado === 'livre' && (
               <button
-                onClick={() => navigate(`${ROUTES.appointmentNew}?data=${date}&hora=${s.time}`)}
-                aria-label={`Livre às ${s.time}. Novo agendamento`}
+                onClick={() => navigate(`${ROUTES.appointmentNew}?data=${date}&hora=${s.horario}`)}
+                aria-label={`Livre às ${s.horario}. Novo agendamento`}
                 className="flex flex-1 items-center gap-2 rounded-8 border border-dashed border-borda-campo px-3 text-texto-secundario hover:border-primaria hover:text-primaria"
               >
                 <Plus className="size-5" aria-hidden /> Livre
               </button>
             )}
-            {s.state === 'ocupado' && (
+            {s.estado === 'ocupado' && (
               <button
-                onClick={() => navigate(ROUTES.appointment(s.appointment.id))}
+                onClick={() => navigate(ROUTES.appointment(s.agendamento.id))}
                 className={`flex flex-1 flex-col justify-center rounded-8 border px-3 py-2 text-left hover:border-primaria ${
-                  s.appointment.status === 'concluido' ? 'border-borda bg-superficie' : 'border-borda-campo bg-superficie-elevada'
+                  s.agendamento.status === 'concluido' ? 'border-borda bg-superficie' : 'border-borda-campo bg-superficie-elevada'
                 }`}
               >
-                <span className="font-medium">{s.appointment.client.name} · {s.appointment.service.name} · {s.appointment.durationMin} min</span>
+                <span className="font-medium">{s.agendamento.cliente.nome} · {s.agendamento.servico.nome} · {s.agendamento.duracaoMinutos} min</span>
                 <span className="texto-corpo-pequeno text-texto-secundario">
-                  {s.appointment.status === 'concluido' ? 'Concluído' : 'Agendado'}
-                  {s.appointment.paymentStatus === 'pendente' ? ' · Pendente' : ''}
+                  {s.agendamento.status === 'concluido' ? 'Concluído' : 'Agendado'}
+                  {s.agendamento.statusPagamento === 'pendente' ? ' · Pendente' : ''}
                 </span>
               </button>
             )}
-            {s.state === 'bloqueado' && (
+            {s.estado === 'bloqueado' && (
               <div className="hachura-info flex flex-1 items-center gap-2 rounded-8 border border-info px-3">
                 <Ban className="size-5 text-info" aria-hidden />
-                <span>Bloqueado{s.reason ? ` · ${s.reason}` : ''}</span>
+                <span>Bloqueado{s.motivo ? ` · ${s.motivo}` : ''}</span>
               </div>
             )}
           </li>
@@ -85,7 +85,7 @@ export function WeekGrid({ date, appointments, onSelectDay }) {
     <div className="-mx-4 overflow-x-auto px-4">
       <div className="grid min-w-[700px] grid-cols-7 gap-2">
         {weekDays(date).map((d) => {
-          const list = appointments.filter((a) => a.startsAt.startsWith(d))
+          const list = appointments.filter((a) => a.horarioInicio.startsWith(d))
           const isToday = d === t
           return (
             <div key={d} className="flex flex-col gap-2">
@@ -104,8 +104,8 @@ export function WeekGrid({ date, appointments, onSelectDay }) {
                   onClick={() => navigate(ROUTES.appointment(a.id))}
                   className="rounded-8 border border-borda-campo bg-superficie-elevada p-2 text-left hover:border-primaria"
                 >
-                  <span className="texto-label block tabular-nums text-texto-secundario">{formatTime(a.startsAt)}</span>
-                  <span className="texto-corpo-pequeno block truncate">{a.client.name}</span>
+                  <span className="texto-label block tabular-nums text-texto-secundario">{formatTime(a.horarioInicio)}</span>
+                  <span className="texto-corpo-pequeno block truncate">{a.cliente.nome}</span>
                 </button>
               ))}
             </div>
