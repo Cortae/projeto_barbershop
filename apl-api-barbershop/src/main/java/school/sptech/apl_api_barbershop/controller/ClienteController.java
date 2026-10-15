@@ -1,6 +1,8 @@
 
 package school.sptech.apl_api_barbershop.controller;
 
+import school.sptech.apl_api_barbershop.dto.ClienteHistoricoResponse;
+
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,5 +70,19 @@ public class ClienteController {
         }
 
         return ResponseEntity.ok(cliente);
+    }
+
+    @GetMapping("/{id}/historico")
+    public ResponseEntity<List<ClienteHistoricoResponse>> historico(
+            @PathVariable Integer id) {
+
+        List<ClienteHistoricoResponse> historico =
+                service.historico(id);
+
+        if (historico == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(historico);
     }
 }
