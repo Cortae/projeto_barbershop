@@ -37,7 +37,7 @@ public class BloqueioController {
 
     @GetMapping
     public ResponseEntity<List<BloqueioResponse>> listarPorPeriodo(
-            @RequestParam @NotNull Long barbeiroId,
+            @RequestParam @NotNull Integer barbeiroId,
             @RequestParam @NotNull LocalDateTime inicio,
             @RequestParam @NotNull LocalDateTime fim
     ) {
@@ -45,7 +45,7 @@ public class BloqueioController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> remover(@PathVariable Long id) {
+    public ResponseEntity<Void> remover(@PathVariable Integer id) {
         bloqueioService.remover(id);
         return ResponseEntity.noContent().build();
     }

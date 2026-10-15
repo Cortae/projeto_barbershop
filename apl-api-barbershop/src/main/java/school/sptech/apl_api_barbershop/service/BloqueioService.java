@@ -1,7 +1,6 @@
 package school.sptech.apl_api_barbershop.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import school.sptech.apl_api_barbershop.dto.bloqueio.BloqueioRequest;
 import school.sptech.apl_api_barbershop.dto.bloqueio.BloqueioResponse;
 import school.sptech.apl_api_barbershop.entity.Bloqueio;
@@ -9,6 +8,7 @@ import school.sptech.apl_api_barbershop.entity.Usuario;
 import school.sptech.apl_api_barbershop.exception.BadRequestException;
 import school.sptech.apl_api_barbershop.exception.BusinessConflictException;
 import school.sptech.apl_api_barbershop.exception.NotFoundException;
+import school.sptech.apl_api_barbershop.mapper.bloqueio.BloqueioMapper;
 import school.sptech.apl_api_barbershop.repository.BloqueioRepository;
 import school.sptech.apl_api_barbershop.repository.UsuarioRepository;
 
@@ -18,41 +18,43 @@ import java.util.List;
 @Service
 public class BloqueioService {
 
-    public static final String MENSAGEM_CONFLITO =
-            "Já existe atendimento nesse horário. Remarque ou cancele antes de bloquear.";
-
     private final BloqueioRepository bloqueioRepository;
     private final UsuarioRepository usuarioRepository;
-    private final AgendamentoConsulta agendamentoConsulta;
+    private final AgendamentoService agendamentoService;
 
     public BloqueioService(
             BloqueioRepository bloqueioRepository,
             UsuarioRepository usuarioRepository,
-            AgendamentoConsulta agendamentoConsulta
+            AgendamentoService agendamentoService
+
     ) {
         this.bloqueioRepository = bloqueioRepository;
         this.usuarioRepository = usuarioRepository;
-        this.agendamentoConsulta = agendamentoConsulta;
+        this.agendamentoService = agendamentoService;
     }
 
-    @Transactional
+    // Métodos principais
     public BloqueioResponse criar(BloqueioRequest request) {
         validarPeriodo(request);
+
         Usuario usuario = buscarUsuario(request.usuarioId());
-        if (agendamentoConsulta.existeAtendimentoNoPeriodo(request.usuarioId(), request.inicio(), request.fim())) {
-            throw new BusinessConflictException(MENSAGEM_CONFLITO);
+
+        if (bloqueioRepository.existsByUsuarioIdAndInicioLessThanAndFimGreaterThan(
+                request.usuarioId(), request.fim(), request.inicio()
+        )) {
+            throw new BusinessConflictException("Já existe um bloqueio sobreposto para esse barbeiro.");
         }
 
-        Bloqueio bloqueio = new Bloqueio();
-        bloqueio.setUsuario(usuario);
-        bloqueio.setInicio(request.inicio());
-        bloqueio.setFim(request.fim());
-        bloqueio.setMotivo(request.motivo());
-        return resposta(bloqueioRepository.save(bloqueio));
+        if (agendamentoService.validarDisponibilidade(request.inicio(), request.usuarioId())) {
+            throw new BusinessConflictException("Já existe atendimento nesse horário. Remarque ou cancele antes de bloquear.");
+        }
+
+        Bloqueio bloqueio = BloqueioMapper.toEntity(request, usuario);
+        return BloqueioMapper.toResponse(bloqueioRepository.save(bloqueio));
     }
 
-    @Transactional(readOnly = true)
-    public List<BloqueioResponse> listarPorPeriodo(Long barbeiroId, LocalDateTime inicio, LocalDateTime fim) {
+
+    public List<BloqueioResponse> listarPorPeriodo(Integer barbeiroId, LocalDateTime inicio, LocalDateTime fim) {
         if (inicio == null || fim == null || barbeiroId == null) {
             throw new BadRequestException("barbeiroId, inicio e fim são obrigatórios");
         }
@@ -61,19 +63,21 @@ public class BloqueioService {
         }
         buscarUsuario(barbeiroId);
         return bloqueioRepository.findByUsuarioIdAndInicioLessThanAndFimGreaterThanOrderByInicioAsc(
-                        barbeiroId.intValue(), fim, inicio
+                        barbeiroId, fim, inicio
                 ).stream()
-                .map(this::resposta)
+                        .map(BloqueioMapper::toResponse)
                 .toList();
     }
 
-    @Transactional
-    public void remover(Long id) {
+
+    public void remover(Integer id) {
         Bloqueio bloqueio = bloqueioRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Bloqueio não encontrado"));
         bloqueioRepository.delete(bloqueio);
     }
 
+
+    // Métodos auxiliares
     private void validarPeriodo(BloqueioRequest request) {
         if (request == null || request.usuarioId() == null || request.inicio() == null || request.fim() == null) {
             throw new BadRequestException("Usuário, início e fim são obrigatórios");
@@ -86,21 +90,12 @@ public class BloqueioService {
         }
     }
 
-    private Usuario buscarUsuario(Long usuarioId) {
-        if (usuarioId > Integer.MAX_VALUE || usuarioId < Integer.MIN_VALUE) {
+    private Usuario buscarUsuario(Integer usuarioId) {
+        if (usuarioId == null) {
             throw new NotFoundException("Usuário não encontrado");
         }
-        return usuarioRepository.findById(usuarioId.intValue())
+        return usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
     }
 
-    private BloqueioResponse resposta(Bloqueio bloqueio) {
-        return new BloqueioResponse(
-                bloqueio.getIdBloqueio(),
-                bloqueio.getUsuario().getId().longValue(),
-                bloqueio.getInicio(),
-                bloqueio.getFim(),
-                bloqueio.getMotivo()
-        );
-    }
 }

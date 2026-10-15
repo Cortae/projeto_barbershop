@@ -11,7 +11,7 @@ public class Bloqueio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_bloqueio")
-    private Long idBloqueio;
+    private Integer idBloqueio;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_usuario", nullable = false)
@@ -26,11 +26,11 @@ public class Bloqueio {
     @Column(name = "motivo", length = 100)
     private String motivo;
 
-    public Long getIdBloqueio() {
+    public Integer getIdBloqueio() {
         return idBloqueio;
     }
 
-    public void setIdBloqueio(Long idBloqueio) {
+    public void setIdBloqueio(Integer idBloqueio) {
         this.idBloqueio = idBloqueio;
     }
 

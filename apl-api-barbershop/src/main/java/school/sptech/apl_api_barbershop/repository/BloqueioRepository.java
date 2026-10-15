@@ -7,9 +7,15 @@ import school.sptech.apl_api_barbershop.entity.Usuario;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface BloqueioRepository extends JpaRepository<Bloqueio, Long> {
+public interface BloqueioRepository extends JpaRepository<Bloqueio, Integer> {
 
     List<Bloqueio> findByUsuarioAndInicioBetween(Usuario usuario, LocalDateTime inicio, LocalDateTime fim);
+
+    boolean existsByUsuarioIdAndInicioLessThanAndFimGreaterThan(
+            Integer usuarioId,
+            LocalDateTime fim,
+            LocalDateTime inicio
+    );
 
     List<Bloqueio> findByUsuarioIdAndInicioLessThanAndFimGreaterThanOrderByInicioAsc(
             Integer usuarioId,
