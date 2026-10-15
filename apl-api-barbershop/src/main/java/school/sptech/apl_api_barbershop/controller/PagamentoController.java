@@ -18,11 +18,5 @@ public class PagamentoController {
         this.pagamentoService = pagamentoService;
     }
 
-    @PatchMapping("{id}/pagar")
-    public ResponseEntity<PagamentoResponse> marcarComoPago(@PathVariable Integer id, @Valid @RequestBody PagarRequest pagarRequest){
-        PagamentoResponse resp = pagamentoService.marcarComoPago(id, pagarRequest);
-
-        return ResponseEntity.ok(resp);
-    }
 
 }

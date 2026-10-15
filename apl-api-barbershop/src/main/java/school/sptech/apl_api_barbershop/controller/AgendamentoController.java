@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import school.sptech.apl_api_barbershop.dto.AgendamentoCadastroRequestDto;
 import school.sptech.apl_api_barbershop.dto.AtualizarServicosAgendamentoRequestDto;
 import school.sptech.apl_api_barbershop.dto.RemarcarAgendamentoRequestDto;
+import school.sptech.apl_api_barbershop.dto.pagamento.PagarRequest;
 import school.sptech.apl_api_barbershop.entity.Agendamento;
 import school.sptech.apl_api_barbershop.repository.AgendamentoRepository;
 import school.sptech.apl_api_barbershop.service.AgendamentoService;
@@ -47,8 +48,8 @@ public class AgendamentoController {
     }
 
     @PatchMapping("/concluir/{id}")
-    public ResponseEntity<Void> concluirAgendamento(@PathVariable Integer id){
-        agendamentoService.concluir(id);
+    public ResponseEntity<Agendamento> concluirAgendamento(@RequestBody(required = false) @Valid PagarRequest request, @PathVariable Integer id){
+        agendamentoService.concluir(id, request);
         return ResponseEntity.ok().build();
     }
 
@@ -102,5 +103,10 @@ public class AgendamentoController {
     @PostMapping
     public ResponseEntity<Agendamento> cadastrar(@RequestBody @Valid AgendamentoCadastroRequestDto agendamento){
         return ResponseEntity.ok().body(agendamentoService.cadastrar(agendamento));
+    }
+
+    @PatchMapping("/pagar")
+    public ResponseEntity<Agendamento> marcarComoPago(@RequestBody @Valid PagarRequest request){
+        return ResponseEntity.ok().body(agendamentoService.registrarPagamento(request));
     }
 }
