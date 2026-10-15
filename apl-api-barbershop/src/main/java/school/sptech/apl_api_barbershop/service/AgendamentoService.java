@@ -13,6 +13,7 @@ import school.sptech.apl_api_barbershop.entity.*;
 import school.sptech.apl_api_barbershop.repository.*;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -196,20 +197,24 @@ public class AgendamentoService {
 
     public Agendamento remarcarAgendamento(@Valid RemarcarAgendamentoRequestDto request) {
 
-        if(!usuarioRepository.existsById(request.getIdAgendamento())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Agendamento não encontrado");
-        }
+        Agendamento agendamento = agendamentoRepository.findById(request.getIdAgendamento())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Agendamento não encontrado"));
 
-        if(agendamentoRepository.existeAgendamentoAtivo(request.getInicio(), request.getIdAgendamento())){
+        long duracaoMinutos = Duration.between(
+                agendamento.getHorarioInicio(), agendamento.getHorarioFim()).toMinutes();
+        LocalDateTime novoFim = request.getInicio().plusMinutes(duracaoMinutos);
+
+        if(agendamentoRepository.existeConflitoHorario(
+                request.getInicio(),
+                novoFim,
+                agendamento.getBarbeiro().getId(),
+                agendamento.getIdAgendamento())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Horário já ocupado para esse barbeiro.");
         }
 
-        Agendamento agendamento = agendamentoRepository.findById(request.getIdAgendamento()).get();
-
-        Integer duracaoMinutos = (agendamento.getHorarioFim().getMinute() - agendamento.getHorarioInicio().getMinute());
-
         agendamento.setHorarioInicio(request.getInicio());
-        agendamento.setHorarioFim(agendamento.getHorarioInicio().plusMinutes(duracaoMinutos));
+        agendamento.setHorarioFim(novoFim);
 
         return agendamentoRepository.save(agendamento);
     }
