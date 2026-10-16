@@ -197,12 +197,12 @@ INSERT INTO servico (id_servico, titulo, valor_atual, duracao_atual, ativo) VALU
 INSERT INTO pagamento (id_pagamento, valor, pago, data_pagamento, fk_forma_pagamento) VALUES
                                                                                           (default, 45.00, TRUE,  DATE '2026-10-08', 1),
                                                                                           (default, 30.00, TRUE,  DATE '2026-10-09', 2),
-                                                                                          (default, 65.00, FALSE, DATE '2026-10-12', 1),
-                                                                                          (default, 50.00, FALSE, DATE '2026-10-12', 3),
+                                                                                          (default, 65.00, FALSE, NULL, NULL),
+                                                                                          (default, 50.00, FALSE, NULL, NULL),
                                                                                           (default, 45.00, TRUE,  DATE '2026-10-10', 4),
                                                                                           (default, 80.00, TRUE,  DATE '2026-10-11', 1),
-                                                                                          (default, 30.00, FALSE, DATE '2026-10-13', 2),
-                                                                                          (default, 65.00, FALSE, DATE '2026-10-14', 1);
+                                                                                          (default, 30.00, FALSE, NULL, NULL),
+                                                                                          (default, 65.00, FALSE, NULL, NULL);
 
 -- ------------------------------------------------------------
 -- Agendamentos

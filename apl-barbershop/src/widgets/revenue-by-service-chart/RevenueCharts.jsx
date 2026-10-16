@@ -1,9 +1,9 @@
-import { formatCurrency } from '@/shared/lib/format'
+import { formatMoney } from '@/shared/lib/format'
 
 export function ProfitChart({ weeks }) {
-  const max = Math.max(1, ...weeks.map((w) => w.valorBrutoCentavos))
-  const empty = weeks.every((w) => w.valorBrutoCentavos === 0)
-  const description = weeks.map((w) => `${w.rotulo}: bruto ${formatCurrency(w.valorBrutoCentavos)}, líquido ${formatCurrency(w.valorLiquidoCentavos)}`).join('; ')
+  const max = Math.max(1, ...weeks.map((w) => w.valorBruto))
+  const empty = weeks.every((w) => w.valorBruto === 0)
+  const description = weeks.map((w) => `${w.rotulo}: bruto ${formatMoney(w.valorBruto)}, líquido ${formatMoney(w.valorLiquido)}`).join('; ')
   return (
     <section aria-labelledby="lucro-mes" className="rounded-12 border border-borda bg-superficie p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -20,8 +20,8 @@ export function ProfitChart({ weeks }) {
         ) : (
           weeks.map((w) => (
             <div key={w.label} className="flex h-full flex-1 items-end justify-center gap-1">
-              <div className="w-1/3 max-w-8 rounded-t-[4px] bg-primaria" style={{ height: `${(w.valorBrutoCentavos / max) * 100}%` }} />
-              <div className="hachura-liquido w-1/3 max-w-8 rounded-t-[4px] border border-primaria-hover" style={{ height: `${(w.valorLiquidoCentavos / max) * 100}%` }} />
+              <div className="w-1/3 max-w-8 rounded-t-[4px] bg-primaria" style={{ height: `${(w.valorBruto / max) * 100}%` }} />
+              <div className="hachura-liquido w-1/3 max-w-8 rounded-t-[4px] border border-primaria-hover" style={{ height: `${(w.valorLiquido / max) * 100}%` }} />
             </div>
           ))
         )}
@@ -44,7 +44,7 @@ export function RevenueByService({ items }) {
           {items.map((s) => (
             <li key={s.servicoId} className="flex items-center gap-3 py-3">
               <span className="flex-1">{s.nome}</span>
-              <span className="texto-valor">{formatCurrency(s.totalCentavos)}</span>
+              <span className="texto-valor">{formatMoney(s.total)}</span>
               <span className="texto-corpo-pequeno w-10 text-right tabular-nums text-texto-secundario">{s.percentual}%</span>
             </li>
           ))}

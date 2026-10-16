@@ -2,19 +2,24 @@ import { useState } from 'react'
 import { Button, BottomSheet, Chip, Segmented } from '@/shared/ui'
 import { useAppMutation } from '@/shared/lib/mutation'
 import { completeAppointment } from '@/entities/appointment'
-import { PAYMENT_METHODS } from '@/entities/payment'
+import { usePaymentMethods } from '@/entities/payment'
 
 export default function CompleteAppointmentButton({ appointmentId, onDone }) {
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState('pago')
-  const [method, setMethod] = useState('pix')
+  const [methodId, setMethodId] = useState(null)
+  const methods = usePaymentMethods()
   const mutation = useAppMutation({
-    mutationFn: () => completeAppointment(appointmentId, { statusPagamento: status, formaPagamento: method }),
+    mutationFn: () => completeAppointment(appointmentId, status === 'pago' ? methodId : null),
     invalidate: ['appointments', 'clients', 'finance'],
     successMessage: status === 'pago' ? 'Atendimento concluído e pago.' : 'Atendimento concluído. Pagamento pendente.',
     onSuccess: onDone,
   })
   const busy = mutation.isPending
+  const submit = () => {
+    if (status === 'pago' && !methodId) return
+    mutation.mutate()
+  }
   return (
     <>
       <Button size="lg" full onClick={() => setOpen(true)}>Concluir atendimento</Button>
@@ -25,7 +30,7 @@ export default function CompleteAppointmentButton({ appointmentId, onDone }) {
         footer={
           <>
             <Button variant="secondary" disabled={busy} onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button loading={busy} loadingLabel="Concluindo..." onClick={() => mutation.mutate()}>Concluir</Button>
+            <Button loading={busy} loadingLabel="Concluindo..." disabled={status === 'pago' && !methodId} onClick={submit}>Concluir</Button>
           </>
         }
       >
@@ -34,8 +39,8 @@ export default function CompleteAppointmentButton({ appointmentId, onDone }) {
           <fieldset>
             <legend className="texto-label mb-2">Forma de pagamento</legend>
             <div className="flex flex-wrap gap-2">
-              {PAYMENT_METHODS.map((m) => (
-                <Chip key={m.value} selected={method === m.value} onClick={() => setMethod(m.value)} disabled={busy}>{m.label}</Chip>
+              {(methods.data ?? []).map((m) => (
+                <Chip key={m.id} selected={methodId === m.id} onClick={() => setMethodId(m.id)} disabled={busy}>{m.titulo.replaceAll('_', ' ')}</Chip>
               ))}
             </div>
           </fieldset>

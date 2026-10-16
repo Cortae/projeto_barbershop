@@ -12,5 +12,7 @@ public interface ServicoRepository extends JpaRepository<Servico, Integer> {
 
     List<Servico> findByAtivoTrue();
 
+    List<Servico> findByAtivoTrueOrderByTituloAsc();
+
     List<Servico> findByAtivoFalse();
 }

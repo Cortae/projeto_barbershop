@@ -20,7 +20,7 @@ export default function GoogleSignInButton() {
     setLoading(true)
     setError(null)
     setTimeout(() => {
-      setSession({ nome: 'Junior', email: 'junior@jrbarbershop.com' })
+      setSession({ id: 2, barbeiroId: 2, nome: 'Lucas Almeida', email: 'lucas@barbershop.test' })
       navigate(ROUTES.home, { replace: true })
     }, 700)
   }

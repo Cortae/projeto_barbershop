@@ -9,7 +9,7 @@ export default function AppointmentCard({ appointment, onClick }) {
       <div className="flex items-center gap-3">
         <span className="texto-label w-12 shrink-0 tabular-nums text-texto-secundario">{formatTime(appointment.horarioInicio)}</span>
         <span className="min-w-0 flex-1 truncate">
-          {appointment.cliente?.nome} · {appointment.servico?.nome}
+          {appointment.cliente?.nome} · {appointment.servicos.map((servico) => servico.nome).join(', ')}
         </span>
         <AppointmentStatusBadge status={appointment.status} />
       </div>

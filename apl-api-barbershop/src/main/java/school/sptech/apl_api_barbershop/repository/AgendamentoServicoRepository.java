@@ -3,6 +3,7 @@ package school.sptech.apl_api_barbershop.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import school.sptech.apl_api_barbershop.entity.AgendamentoServico;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface AgendamentoServicoRepository extends JpaRepository<AgendamentoServico, Integer> {
@@ -12,4 +13,6 @@ public interface AgendamentoServicoRepository extends JpaRepository<AgendamentoS
     void deleteByAgendamentoIdAgendamento(Integer id);
 
     List<AgendamentoServico> findByAgendamentoIdAgendamento(Integer id);
+
+    List<AgendamentoServico> findAllByAgendamentoIdAgendamentoIn(Collection<Integer> idsAgendamentos);
 }

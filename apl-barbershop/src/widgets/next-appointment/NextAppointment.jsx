@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router'
 import { Card, Button } from '@/shared/ui'
-import { formatCurrency, formatTime } from '@/shared/lib/format'
+import { formatMoney, formatTime } from '@/shared/lib/format'
 import { ROUTES } from '@/shared/config'
 
 export default function NextAppointment({ appointment }) {
@@ -13,7 +13,7 @@ export default function NextAppointment({ appointment }) {
         {formatTime(appointment.horarioInicio)} · {appointment.cliente.nome}
       </p>
       <p className="text-texto-secundario tabular-nums">
-        {appointment.servico.nome} · {formatCurrency(appointment.valorCentavos)}
+        {appointment.servicos.map((servico) => servico.nome).join(', ')} · {formatMoney(appointment.valor)}
       </p>
       <Button variant="secondary" size="sm" className="mt-2 self-start" onClick={() => navigate(ROUTES.appointment(appointment.id))}>
         Ver detalhes
