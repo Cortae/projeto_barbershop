@@ -1,6 +1,7 @@
 package school.sptech.apl_api_barbershop.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.sptech.apl_api_barbershop.entity.Agendamento;
 import school.sptech.apl_api_barbershop.entity.AgendamentoServico;
 import school.sptech.apl_api_barbershop.entity.Servico;
@@ -33,12 +34,13 @@ public class AgendamentoServicoService {
     }
 
 
+    @Transactional
     public void atualizarServicos(Agendamento agendamento, List<Servico> servicos){
 
         if(agendamentoServicoRepository.existsByAgendamentoIdAgendamento(agendamento.getIdAgendamento())){
             agendamentoServicoRepository.deleteByAgendamentoIdAgendamento(agendamento.getIdAgendamento());
         }
 
-        atualizarServicos(agendamento, servicos);
+        vincularAgendamentoServico(agendamento, servicos);
     }
 }

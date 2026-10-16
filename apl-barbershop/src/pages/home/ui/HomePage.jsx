@@ -16,13 +16,13 @@ export default function HomePage() {
   const { data, isLoading, isError, refetch } = useAppointments(t, t)
   const now = new Date().toTimeString().slice(0, 5)
   const scheduled = data?.filter((a) => a.status === 'agendado') ?? []
-  const next = scheduled.find((a) => a.startsAt.slice(11, 16) >= now) ?? scheduled[0]
+  const next = scheduled.find((a) => a.horarioInicio.slice(11, 16) >= now) ?? scheduled[0]
 
   return (
     <AppLayout title="Início" variant="home" primaryAction={{ label: 'Novo agendamento', onClick: () => navigate(ROUTES.appointmentNew) }}>
       <div className="flex flex-col gap-6">
         <div>
-          <h2 className="texto-h1">{greeting()}, {session?.name}!</h2>
+          <h2 className="texto-h1">{greeting()}, {session?.nome}!</h2>
           {isLoading ? (
             <Skeleton className="mt-2 h-6 w-48" />
           ) : (

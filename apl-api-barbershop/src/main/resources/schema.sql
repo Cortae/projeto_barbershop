@@ -160,10 +160,9 @@ INSERT INTO usuario
 
 INSERT INTO status_agendamento (id_status_agendamento, titulo) VALUES
                                                                    (default, 'AGENDADO'),
-                                                                   (default, 'CONFIRMADO'),
-                                                                   (default, 'EM_ANDAMENTO'),
                                                                    (default, 'CONCLUIDO'),
                                                                    (default, 'CANCELADO'),
+                                                                   (default, 'EM_ANDAMENTO'),
                                                                    (default, 'NAO_COMPARECEU');
 
 INSERT INTO cliente (id_cliente, nome, apelido, celular) VALUES

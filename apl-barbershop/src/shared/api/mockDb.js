@@ -8,42 +8,42 @@ let seq = 100
 export const nextId = (prefix) => `${prefix}${++seq}`
 
 export const db = {
-  services: [
-    { id: 's1', name: 'Corte masculino', priceCents: 4500, durationMin: 30 },
-    { id: 's2', name: 'Barba', priceCents: 3000, durationMin: 30 },
-    { id: 's3', name: 'Corte + barba', priceCents: 7000, durationMin: 60 },
-    { id: 's4', name: 'Sobrancelha', priceCents: 1500, durationMin: 15 },
+  servicos: [
+    { id: 's1', nome: 'Corte masculino', valorCentavos: 4500, duracaoMinutos: 30 },
+    { id: 's2', nome: 'Barba', valorCentavos: 3000, duracaoMinutos: 30 },
+    { id: 's3', nome: 'Corte + barba', valorCentavos: 7000, duracaoMinutos: 60 },
+    { id: 's4', nome: 'Sobrancelha', valorCentavos: 1500, duracaoMinutos: 15 },
   ],
-  clients: [
-    { id: 'c1', name: 'Carlos Souza', phone: '(11) 98765-4321', email: 'carlos@email.com', birthDate: '1990-04-12', notes: '' },
-    { id: 'c2', name: 'Rafael Lima', phone: '(11) 91234-5678', email: '', birthDate: '', notes: 'Prefere máquina 2 nas laterais.' },
-    { id: 'c3', name: 'Bruno Alves', phone: '(11) 99876-1234', email: '', birthDate: '', notes: '' },
-    { id: 'c4', name: 'Diego Martins', phone: '(11) 97654-3210', email: 'diego@email.com', birthDate: '', notes: '' },
-    { id: 'c5', name: 'Lucas Ferreira', phone: '(11) 96543-2109', email: '', birthDate: '', notes: '' },
+  clientes: [
+    { id: 'c1', nome: 'Carlos Souza', telefone: '(11) 98765-4321', email: 'carlos@email.com', dataNascimento: '1990-04-12', observacoes: '' },
+    { id: 'c2', nome: 'Rafael Lima', telefone: '(11) 91234-5678', email: '', dataNascimento: '', observacoes: 'Prefere máquina 2 nas laterais.' },
+    { id: 'c3', nome: 'Bruno Alves', telefone: '(11) 99876-1234', email: '', dataNascimento: '', observacoes: '' },
+    { id: 'c4', nome: 'Diego Martins', telefone: '(11) 97654-3210', email: 'diego@email.com', dataNascimento: '', observacoes: '' },
+    { id: 'c5', nome: 'Lucas Ferreira', telefone: '(11) 96543-2109', email: '', dataNascimento: '', observacoes: '' },
   ],
-  appointments: [
-    { id: 'a1', clientId: 'c1', serviceId: 's1', startsAt: at(0, '09:00'), status: 'concluido', paymentStatus: 'pago', paymentMethod: 'pix' },
-    { id: 'a2', clientId: 'c2', serviceId: 's3', startsAt: at(0, '10:00'), status: 'concluido', paymentStatus: 'pendente' },
-    { id: 'a3', clientId: 'c3', serviceId: 's1', startsAt: at(0, '14:00'), status: 'agendado' },
-    { id: 'a4', clientId: 'c4', serviceId: 's2', startsAt: at(0, '15:00'), status: 'agendado' },
-    { id: 'a5', clientId: 'c5', serviceId: 's3', startsAt: at(0, '16:30'), status: 'agendado' },
-    { id: 'a6', clientId: 'c1', serviceId: 's3', startsAt: at(-1, '11:00'), status: 'concluido', paymentStatus: 'pendente' },
-    { id: 'a7', clientId: 'c3', serviceId: 's2', startsAt: at(-2, '09:30'), status: 'concluido', paymentStatus: 'pago', paymentMethod: 'dinheiro' },
-    { id: 'a8', clientId: 'c4', serviceId: 's1', startsAt: at(-6, '10:00'), status: 'concluido', paymentStatus: 'pago', paymentMethod: 'credito' },
-    { id: 'a9', clientId: 'c2', serviceId: 's1', startsAt: at(-9, '17:00'), status: 'concluido', paymentStatus: 'pago', paymentMethod: 'pix' },
-    { id: 'a10', clientId: 'c5', serviceId: 's4', startsAt: at(-13, '13:30'), status: 'concluido', paymentStatus: 'pago', paymentMethod: 'debito' },
-    { id: 'a11', clientId: 'c2', serviceId: 's1', startsAt: at(1, '09:00'), status: 'agendado' },
-    { id: 'a12', clientId: 'c4', serviceId: 's3', startsAt: at(2, '14:00'), status: 'agendado' },
+  agendamentos: [
+    { id: 'a1', clienteId: 'c1', servicoId: 's1', horarioInicio: at(0, '09:00'), status: 'concluido', statusPagamento: 'pago', formaPagamento: 'pix' },
+    { id: 'a2', clienteId: 'c2', servicoId: 's3', horarioInicio: at(0, '10:00'), status: 'concluido', statusPagamento: 'pendente' },
+    { id: 'a3', clienteId: 'c3', servicoId: 's1', horarioInicio: at(0, '14:00'), status: 'agendado' },
+    { id: 'a4', clienteId: 'c4', servicoId: 's2', horarioInicio: at(0, '15:00'), status: 'agendado' },
+    { id: 'a5', clienteId: 'c5', servicoId: 's3', horarioInicio: at(0, '16:30'), status: 'agendado' },
+    { id: 'a6', clienteId: 'c1', servicoId: 's3', horarioInicio: at(-1, '11:00'), status: 'concluido', statusPagamento: 'pendente' },
+    { id: 'a7', clienteId: 'c3', servicoId: 's2', horarioInicio: at(-2, '09:30'), status: 'concluido', statusPagamento: 'pago', formaPagamento: 'dinheiro' },
+    { id: 'a8', clienteId: 'c4', servicoId: 's1', horarioInicio: at(-6, '10:00'), status: 'concluido', statusPagamento: 'pago', formaPagamento: 'credito' },
+    { id: 'a9', clienteId: 'c2', servicoId: 's1', horarioInicio: at(-9, '17:00'), status: 'concluido', statusPagamento: 'pago', formaPagamento: 'pix' },
+    { id: 'a10', clienteId: 'c5', servicoId: 's4', horarioInicio: at(-13, '13:30'), status: 'concluido', statusPagamento: 'pago', formaPagamento: 'debito' },
+    { id: 'a11', clienteId: 'c2', servicoId: 's1', horarioInicio: at(1, '09:00'), status: 'agendado' },
+    { id: 'a12', clienteId: 'c4', servicoId: 's3', horarioInicio: at(2, '14:00'), status: 'agendado' },
   ].map((a) => {
-    const s = { s1: [4500, 30], s2: [3000, 30], s3: [7000, 60], s4: [1500, 15] }[a.serviceId]
-    return { notes: '', ...a, priceCents: s[0], durationMin: s[1] }
+    const s = { s1: [4500, 30], s2: [3000, 30], s3: [7000, 60], s4: [1500, 15] }[a.servicoId]
+    return { observacoes: '', ...a, valorCentavos: s[0], duracaoMinutos: s[1] }
   }),
-  blocks: [{ id: 'b1', date: addDays(t, 1), start: '12:00', end: '13:00', reason: 'Almoço' }],
-  workingHours: { days: [1, 2, 3, 4, 5, 6], opensAt: '09:00', closesAt: '18:00', breakStart: '12:00', breakEnd: '13:00' },
-  expenses: [
-    { id: 'e1', description: 'Aluguel', amountCents: 120000, date: `${t.slice(0, 7)}-05` },
-    { id: 'e2', description: 'Produtos (pomada, lâminas)', amountCents: 18000, date: `${t.slice(0, 7)}-08` },
-    { id: 'e3', description: 'Energia', amountCents: 21000, date: `${t.slice(0, 7)}-10` },
+  bloqueios: [{ id: 'b1', data: addDays(t, 1), inicio: '12:00', fim: '13:00', motivo: 'Almoço' }],
+  expediente: { dias: [1, 2, 3, 4, 5, 6], horarioAbertura: '09:00', horarioFechamento: '18:00', inicioIntervalo: '12:00', fimIntervalo: '13:00' },
+  despesas: [
+    { id: 'e1', descricao: 'Aluguel', valorCentavos: 120000, data: `${t.slice(0, 7)}-05` },
+    { id: 'e2', descricao: 'Produtos (pomada, lâminas)', valorCentavos: 18000, data: `${t.slice(0, 7)}-08` },
+    { id: 'e3', descricao: 'Energia', valorCentavos: 21000, data: `${t.slice(0, 7)}-10` },
   ],
 }
 

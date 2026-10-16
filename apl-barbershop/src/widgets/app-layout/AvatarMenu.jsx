@@ -22,7 +22,7 @@ export default function AvatarMenu() {
   }, [open])
   return (
     <div ref={ref} className="relative">
-      <Avatar name={session?.name} aria-label="Menu da conta" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)} />
+      <Avatar name={session?.nome} aria-label="Menu da conta" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)} />
       {open && (
         <div role="menu" className="absolute right-0 top-full z-40 mt-2 w-48 rounded-12 border border-borda bg-superficie-elevada p-2">
           <p className="texto-corpo-pequeno truncate px-3 py-2 text-texto-secundario">{session?.email}</p>

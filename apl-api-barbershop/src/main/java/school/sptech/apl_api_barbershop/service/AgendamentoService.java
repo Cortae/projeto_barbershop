@@ -8,10 +8,12 @@ import org.springframework.web.server.ResponseStatusException;
 import school.sptech.apl_api_barbershop.dto.AgendamentoCadastroRequestDto;
 import school.sptech.apl_api_barbershop.dto.AtualizarServicosAgendamentoRequestDto;
 import school.sptech.apl_api_barbershop.dto.RemarcarAgendamentoRequestDto;
+import school.sptech.apl_api_barbershop.dto.pagamento.PagarRequest;
 import school.sptech.apl_api_barbershop.entity.*;
 import school.sptech.apl_api_barbershop.repository.*;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -25,7 +27,7 @@ public class AgendamentoService {
 
     private final AgendamentoRepository agendamentoRepository;
     private final ServicoRepository servicoRepository;
-    private final StatusAgendamentoRepository statusAgendamentoRepository;
+    private final StatusAgendamentoService statusAgendamentoService;
     private final ClienteRepository clienteRepository;
     private final PagamentoService pagamentoService;
     private final UsuarioRepository usuarioRepository;
@@ -33,14 +35,14 @@ public class AgendamentoService {
 
     public AgendamentoService(AgendamentoRepository agendamentoRepository,
                               ServicoRepository servicoRepository,
-                              StatusAgendamentoRepository statusAgendamentoRepository,
+                              StatusAgendamentoService statusAgendamentoService,
                               ClienteRepository clienteRepository,
                               PagamentoService pagamentoService,
                               UsuarioRepository usuarioRepository,
                               AgendamentoServicoService agendamentoServicoService) {
         this.agendamentoRepository = agendamentoRepository;
         this.servicoRepository = servicoRepository;
-        this.statusAgendamentoRepository = statusAgendamentoRepository;
+        this.statusAgendamentoService = statusAgendamentoService;
         this.clienteRepository = clienteRepository;
         this.pagamentoService = pagamentoService;
         this.usuarioRepository = usuarioRepository;
@@ -51,18 +53,37 @@ public class AgendamentoService {
         return agendamentoRepository.findAllByBarbeiro(id);
     }
 
-    public void atualizarStatus(Integer id, String acao) {
+    public Agendamento atualizarStatus(Integer id, String acao) {
 
-        StatusAgendamento status = statusAgendamentoRepository.findByTituloContainingIgnoreCase(acao);
+        if(!existeAgendamento(id)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento não encontrado.");
+        }
+        if(!statusAgendamentoService.existeStatusContaining(acao)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status não permitido.");
+        }
+
+        StatusAgendamento status = statusAgendamentoService.buscaStatus(acao);
         Agendamento agendamento = agendamentoRepository.findById(id).get();
 
         agendamento.setStatusAgendamento(status);
 
-        agendamentoRepository.save(agendamento);
+        return agendamentoRepository.save(agendamento);
 
     }
 
-    public void concluir(Integer id) {
+    public Agendamento concluir(Integer id, PagarRequest request) {
+
+        if(!existeAgendamento(id)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento não encontrado");
+        }
+
+        atualizarStatus(id, "CONCLUIDO");
+        if(request != null){
+            request.setIdAgendamento(id);
+            registrarPagamento(request);
+        }
+
+        return buscarPorId(id).get();
 
     }
 
@@ -71,10 +92,6 @@ public class AgendamentoService {
         return agendamentoRepository.findByHorarioInicioBetweenOrderByHorarioInicioAsc( de.atStartOfDay(), ate.atTime(LocalTime.MAX));
     }
 
-    public Optional<Agendamento> buscarPorId(Integer id) {
-
-        return agendamentoRepository.findById(id);
-    }
 
     public boolean existeCliente(Integer id) {
         return clienteRepository.existsById(id);
@@ -141,14 +158,16 @@ public class AgendamentoService {
         Pagamento pagamento = pagamentoService.registrar(valorTotal);
 
         LocalDateTime fimAtendimento = agendamento.getInicio().plusMinutes((long) duracaoTotal);
-        StatusAgendamento status = statusAgendamentoRepository.findByTituloContainingIgnoreCase("agendado");
+        StatusAgendamento status = statusAgendamentoService.buscaStatus("agendado");
+        String titulo = cliente.get().getNome() + " - Duração: "+ duracaoTotal+ "min";
+
 
 
         return new Agendamento(
                 null,
                 agendamento.getInicio(),
                 fimAtendimento,
-                "Isso é um teste",
+                titulo,
                 status,
                 barbeiro.get(),
                 cliente.get(),
@@ -178,25 +197,66 @@ public class AgendamentoService {
 
     public Agendamento remarcarAgendamento(@Valid RemarcarAgendamentoRequestDto request) {
 
-        if(!usuarioRepository.existsById(request.getIdAgendamento())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Agendamento não encontrado");
-        }
+        Agendamento agendamento = agendamentoRepository.findById(request.getIdAgendamento())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Agendamento não encontrado"));
 
-        if(agendamentoRepository.existeAgendamentoAtivo(request.getInicio(), request.getIdAgendamento())){
+        long duracaoMinutos = Duration.between(
+                agendamento.getHorarioInicio(), agendamento.getHorarioFim()).toMinutes();
+        LocalDateTime novoFim = request.getInicio().plusMinutes(duracaoMinutos);
+
+        if(agendamentoRepository.existeConflitoHorario(
+                request.getInicio(),
+                novoFim,
+                agendamento.getBarbeiro().getId(),
+                agendamento.getIdAgendamento())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Horário já ocupado para esse barbeiro.");
         }
 
-        Agendamento agendamento = agendamentoRepository.findById(request.getIdAgendamento()).get();
-
-        Integer duracaoMinutos = (agendamento.getHorarioFim().getMinute() - agendamento.getHorarioInicio().getMinute());
-
         agendamento.setHorarioInicio(request.getInicio());
-        agendamento.setHorarioFim(agendamento.getHorarioInicio().plusMinutes(duracaoMinutos));
+        agendamento.setHorarioFim(novoFim);
 
         return agendamentoRepository.save(agendamento);
     }
 
     public boolean validarDisponibilidade(LocalDateTime horarioInicio, Integer idBarbeiro){
         return agendamentoRepository.existeAgendamentoAtivo(horarioInicio, idBarbeiro);
+    }
+
+    public Agendamento registrarPagamento(PagarRequest request) {
+
+        if(!existeAgendamento(request.getIdAgendamento())){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento não encontrado");
+        }
+        Agendamento agendamento = buscarPorId(request.getIdAgendamento()).get();
+
+        if(!agendamentoEstaConcluido(request.getIdAgendamento())){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento precisa estar conclúido para pagar");
+        }
+
+        pagamentoService.marcarComoPago(agendamento.getPagamento().getId(), request.getFormaPagamentoId());
+
+        return buscarPorId(request.getIdAgendamento()).get();
+    }
+
+
+
+    public boolean existeAgendamento(Integer id){
+        return agendamentoRepository.existsById(id);
+    }
+
+    public boolean agendamentoEstaConcluido(Integer id){
+
+        if(!existeAgendamento(id)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento não encontrado.");
+        }
+        Agendamento agendamento = agendamentoRepository.findById(id).get();
+
+        return agendamento.getStatusAgendamento().getTitulo().equalsIgnoreCase("CONCLUIDO") ? true : false;
+    }
+
+    public Optional<Agendamento> buscarPorId(Integer id) {
+
+        return agendamentoRepository.findById(id);
     }
 }

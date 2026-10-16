@@ -7,7 +7,7 @@ export default function MarkAsPaidButton({ appointment, size = 'sm', full }) {
   const mutation = useAppMutation({
     mutationFn: () => markAppointmentPaid(appointment.id),
     invalidate: ['appointments', 'clients', 'finance'],
-    successMessage: `Pagamento de ${formatCurrency(appointment.priceCents)} registrado.`,
+    successMessage: `Pagamento de ${formatCurrency(appointment.valorCentavos)} registrado.`,
   })
   return (
     <Button

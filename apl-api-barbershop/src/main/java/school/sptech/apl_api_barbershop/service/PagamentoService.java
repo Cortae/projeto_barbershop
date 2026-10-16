@@ -39,10 +39,9 @@ public class PagamentoService {
         return pagamentoRepository.save(pagamento);
     }
 
-    public PagamentoResponse marcarComoPago(Integer pagamentoId, PagarRequest pagarRequest){
+    public PagamentoResponse marcarComoPago(Integer pagamentoId, Integer idFormaPagamento){
         Optional<Pagamento> pagamento = pagamentoRepository.findById(pagamentoId);
-        Optional<FormaPagamento> formaPagamento = formaPagamentoRepository.findById(pagarRequest.getFormaPagamentoId());
-        Optional<Agendamento> agendamento = agendamentoRepository.findByPagamentoId(pagamentoId);
+        Optional<FormaPagamento> formaPagamento = formaPagamentoRepository.findById(idFormaPagamento);
 
         if(pagamento.isEmpty()){
             throw new ResponseStatusException(
@@ -56,22 +55,9 @@ public class PagamentoService {
             );
         }
 
-        if(agendamento.isEmpty()){
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Agendamento não encontrado"
-            );
-        }
-
-
         if(pagamento.get().isPago()){
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT, "Este pagamento já foi registrado como pago"
-            );
-        }
-
-        if (!agendamento.get().getStatusAgendamento().getTitulo().equals("CONCLUIDO")){
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "O atendimento precisa estar concluído para registrar o pagamento"
             );
         }
 

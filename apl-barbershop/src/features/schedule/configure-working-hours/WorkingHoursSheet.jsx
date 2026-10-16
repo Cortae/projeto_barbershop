@@ -13,7 +13,7 @@ export default function WorkingHoursSheet({ open, onClose, hours }) {
     onSuccess: onClose,
   })
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
-  const toggleDay = (d) => setForm((f) => ({ ...f, days: f.days.includes(d) ? f.days.filter((x) => x !== d) : [...f.days, d].sort() }))
+  const toggleDay = (d) => setForm((f) => ({ ...f, dias: f.dias.includes(d) ? f.dias.filter((x) => x !== d) : [...f.dias, d].sort() }))
   const busy = mutation.isPending
   return (
     <BottomSheet
@@ -31,17 +31,17 @@ export default function WorkingHoursSheet({ open, onClose, hours }) {
         <legend className="texto-label mb-2">Dias de funcionamento</legend>
         <div className="flex flex-wrap gap-2">
           {WEEKDAYS_SHORT.map((label, d) => (
-            <Chip key={label} selected={form.days.includes(d)} onClick={() => toggleDay(d)} disabled={busy}>{label}</Chip>
+            <Chip key={label} selected={form.dias.includes(d)} onClick={() => toggleDay(d)} disabled={busy}>{label}</Chip>
           ))}
         </div>
       </fieldset>
       <div className="grid grid-cols-2 gap-3">
-        <TextField label="Abertura" type="time" value={form.opensAt} onChange={set('opensAt')} disabled={busy} />
-        <TextField label="Fechamento" type="time" value={form.closesAt} onChange={set('closesAt')} disabled={busy} />
+        <TextField label="Abertura" type="time" value={form.horarioAbertura} onChange={set('horarioAbertura')} disabled={busy} />
+        <TextField label="Fechamento" type="time" value={form.horarioFechamento} onChange={set('horarioFechamento')} disabled={busy} />
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <TextField label="Intervalo (opcional) · início" type="time" value={form.breakStart ?? ''} onChange={set('breakStart')} disabled={busy} />
-        <TextField label="Intervalo · fim" type="time" value={form.breakEnd ?? ''} onChange={set('breakEnd')} disabled={busy} />
+        <TextField label="Intervalo (opcional) · início" type="time" value={form.inicioIntervalo ?? ''} onChange={set('inicioIntervalo')} disabled={busy} />
+        <TextField label="Intervalo · fim" type="time" value={form.fimIntervalo ?? ''} onChange={set('fimIntervalo')} disabled={busy} />
       </div>
     </BottomSheet>
   )

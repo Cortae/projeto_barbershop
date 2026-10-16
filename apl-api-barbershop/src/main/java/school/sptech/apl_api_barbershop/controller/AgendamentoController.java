@@ -2,6 +2,7 @@ package school.sptech.apl_api_barbershop.controller;
 
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import school.sptech.apl_api_barbershop.dto.AgendamentoCadastroRequestDto;
 import school.sptech.apl_api_barbershop.dto.AtualizarServicosAgendamentoRequestDto;
 import school.sptech.apl_api_barbershop.dto.RemarcarAgendamentoRequestDto;
+import school.sptech.apl_api_barbershop.dto.pagamento.PagarRequest;
 import school.sptech.apl_api_barbershop.entity.Agendamento;
 import school.sptech.apl_api_barbershop.repository.AgendamentoRepository;
 import school.sptech.apl_api_barbershop.service.AgendamentoService;
@@ -41,14 +43,20 @@ public class AgendamentoController {
     }
 
     @PatchMapping("/cancelar/{id}")
-    public ResponseEntity<Void> cancelarAgendamento(@PathVariable Integer id){
-        agendamentoService.atualizarStatus(id, "CANCELADO");
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Agendamento> cancelarAgendamento(@PathVariable Integer id){
+        return ResponseEntity.ok().body(agendamentoService.atualizarStatus(id, "CANCELADO"));
+    }
+
+    @PatchMapping("/atualizar-status/{id}")
+    public ResponseEntity<Agendamento> confirmarAgendamento(
+            @PathVariable Integer id,
+            @RequestParam(required = true) @Valid @NotBlank String status){
+        return ResponseEntity.ok().body(agendamentoService.atualizarStatus(id, status));
     }
 
     @PatchMapping("/concluir/{id}")
-    public ResponseEntity<Void> concluirAgendamento(@PathVariable Integer id){
-        agendamentoService.concluir(id);
+    public ResponseEntity<Agendamento> concluirAgendamento(@RequestBody(required = false) @Valid PagarRequest request, @PathVariable Integer id){
+        agendamentoService.concluir(id, request);
         return ResponseEntity.ok().build();
     }
 
@@ -102,5 +110,10 @@ public class AgendamentoController {
     @PostMapping
     public ResponseEntity<Agendamento> cadastrar(@RequestBody @Valid AgendamentoCadastroRequestDto agendamento){
         return ResponseEntity.ok().body(agendamentoService.cadastrar(agendamento));
+    }
+
+    @PatchMapping("/pagar")
+    public ResponseEntity<Agendamento> marcarComoPago(@RequestBody @Valid PagarRequest request){
+        return ResponseEntity.ok().body(agendamentoService.registrarPagamento(request));
     }
 }

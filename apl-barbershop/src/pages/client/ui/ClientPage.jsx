@@ -18,7 +18,7 @@ export default function ClientPage() {
     fromAppointment ? navigate(`${ROUTES.appointmentNew}?clienteId=${c.id}`, { replace: true }) : navigate(ROUTES.clients)
 
   return (
-    <AppLayout title={id ? data?.name ?? 'Cliente' : 'Novo cliente'} back>
+    <AppLayout title={id ? data?.nome ?? 'Cliente' : 'Novo cliente'} back>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <section aria-labelledby="dados-cliente" className="flex flex-col gap-4">
           <h2 id="dados-cliente" className="texto-h2 hidden lg:block">Dados do cliente</h2>
@@ -28,7 +28,7 @@ export default function ClientPage() {
         </section>
         {id && data && (
           <div className="flex flex-col gap-4">
-            <ClientHistory clientId={id} />
+            <ClientHistory clienteId={id} />
             <Button variant="secondary" icon={CalendarPlus} onClick={() => navigate(`${ROUTES.appointmentNew}?clienteId=${id}`)}>Agendar corte</Button>
           </div>
         )}
