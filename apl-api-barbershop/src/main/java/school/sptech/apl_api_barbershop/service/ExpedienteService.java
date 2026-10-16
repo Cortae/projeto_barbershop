@@ -1,6 +1,7 @@
 package school.sptech.apl_api_barbershop.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.sptech.apl_api_barbershop.dto.expediente.DiaExpedienteRequest;
 import school.sptech.apl_api_barbershop.dto.expediente.ExpedienteRequest;
 import school.sptech.apl_api_barbershop.dto.expediente.ExpedienteResponse;
@@ -33,6 +34,7 @@ public class ExpedienteService {
 
 
     // Métodos Principais
+    @Transactional
     public ExpedienteResponse configurar(Integer usuarioId, ExpedienteRequest request) {
         Usuario usuario = buscarUsuario(usuarioId);
         validar(request);
@@ -62,6 +64,7 @@ public class ExpedienteService {
     }
 
 
+    @Transactional(readOnly = true)
     public ExpedienteResponse consultar(Integer usuarioId) {
         Usuario usuario = buscarUsuario(usuarioId);
         List<Expediente> dias = expedienteRepository.findByUsuarioIdOrderByDiaSemana(usuario.getId());
@@ -69,6 +72,7 @@ public class ExpedienteService {
     }
 
 
+    @Transactional(readOnly = true)
     public JanelaFuncionamento obterDoDia(Integer barbeiroId, LocalDate data) {
         Usuario usuario = buscarUsuario(barbeiroId);
         int diaSemana = data.getDayOfWeek().getValue();
@@ -78,6 +82,7 @@ public class ExpedienteService {
     }
 
 
+    @Transactional
     public void inicializarPadrao(Usuario usuario) {
         if (usuario.getId() == null) {
             throw new IllegalArgumentException("O usuário precisa estar persistido para inicializar o expediente");

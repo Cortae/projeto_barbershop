@@ -1,6 +1,7 @@
 package school.sptech.apl_api_barbershop.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.sptech.apl_api_barbershop.dto.bloqueio.BloqueioRequest;
 import school.sptech.apl_api_barbershop.dto.bloqueio.BloqueioResponse;
 import school.sptech.apl_api_barbershop.entity.Bloqueio;
@@ -34,6 +35,7 @@ public class BloqueioService {
     }
 
     // Métodos principais
+    @Transactional
     public BloqueioResponse criar(BloqueioRequest request) {
         validarPeriodo(request);
 
@@ -54,6 +56,7 @@ public class BloqueioService {
     }
 
 
+    @Transactional(readOnly = true)
     public List<BloqueioResponse> listarPorPeriodo(Integer barbeiroId, LocalDateTime inicio, LocalDateTime fim) {
         if (inicio == null || fim == null || barbeiroId == null) {
             throw new BadRequestException("barbeiroId, inicio e fim são obrigatórios");
@@ -70,6 +73,7 @@ public class BloqueioService {
     }
 
 
+    @Transactional
     public void remover(Integer id) {
         Bloqueio bloqueio = bloqueioRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Bloqueio não encontrado"));
