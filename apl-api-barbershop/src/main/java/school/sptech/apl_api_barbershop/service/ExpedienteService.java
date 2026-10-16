@@ -53,8 +53,8 @@ public class ExpedienteService {
         }
 
         List<Expediente> expedientesConfigurados = new ArrayList<>();
-        for (DiaExpedienteRequest dia : request.dias()) {
-            Expediente existente = expedientesExistentes[dia.diaSemana()];
+        for (DiaExpedienteRequest dia : request.getDias()) {
+            Expediente existente = expedientesExistentes[dia.getDiaSemana()];
             Expediente expediente = ExpedienteMapper.toEntity(usuario, existente, dia);
             expedientesConfigurados.add(expediente);
         }
@@ -119,17 +119,17 @@ public class ExpedienteService {
     }
 
     private void validar(ExpedienteRequest request) {
-        if (request == null || request.dias() == null || request.dias().size() != 7) {
+        if (request == null || request.getDias() == null || request.getDias().size() != 7) {
             throw new BadRequestException("O expediente deve conter exatamente 7 dias");
         }
 
         boolean[] diasRecebidos = new boolean[8];
-        for (DiaExpedienteRequest dia : request.dias()) {
+        for (DiaExpedienteRequest dia : request.getDias()) {
             if (dia == null || !dia.configuracaoValida()) {
                 throw new BadRequestException("Dia da semana ou horários do expediente inválidos");
             }
 
-            int diaSemana = dia.diaSemana();
+            int diaSemana = dia.getDiaSemana();
             if (diasRecebidos[diaSemana]) {
                 throw new BadRequestException("O dia da semana " + diaSemana + " foi informado mais de uma vez");
             }

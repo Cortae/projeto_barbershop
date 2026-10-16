@@ -18,12 +18,12 @@ public final class ExpedienteMapper {
     public static Expediente toEntity(Usuario usuario, Expediente existente, DiaExpedienteRequest request) {
         Expediente expediente = existente == null ? new Expediente() : existente;
         expediente.setUsuario(usuario);
-        expediente.setDiaSemana(request.diaSemana());
-        expediente.setAberto(request.aberto());
-        expediente.setHoraAbertura(request.horaAbertura());
-        expediente.setHoraFechamento(request.horaFechamento());
-        expediente.setIntervaloInicio(request.intervaloInicio());
-        expediente.setIntervaloFim(request.intervaloFim());
+        expediente.setDiaSemana(request.getDiaSemana());
+        expediente.setAberto(request.getAberto());
+        expediente.setHoraAbertura(request.getHoraAbertura());
+        expediente.setHoraFechamento(request.getHoraFechamento());
+        expediente.setIntervaloInicio(request.getIntervaloInicio());
+        expediente.setIntervaloFim(request.getIntervaloFim());
         return expediente;
     }
 
@@ -53,7 +53,7 @@ public final class ExpedienteMapper {
     public static ExpedienteResponse toResponse(Integer usuarioId, List<Expediente> expedientes) {
         List<DiaExpedienteResponse> dias = expedientes.stream()
                 .map(ExpedienteMapper::toDiaResponse)
-                .sorted(Comparator.comparing(DiaExpedienteResponse::diaSemana))
+                .sorted(Comparator.comparing(DiaExpedienteResponse::getDiaSemana))
                 .toList();
         return new ExpedienteResponse(usuarioId, dias);
     }
