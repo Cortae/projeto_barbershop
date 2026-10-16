@@ -58,7 +58,7 @@ export function DayGrid({ date, hours, appointments, blocks, onBlock }) {
                   s.agendamento.status === 'concluido' ? 'border-borda bg-superficie' : 'border-borda-campo bg-superficie-elevada'
                 }`}
               >
-                <span className="font-medium">{s.agendamento.cliente.nome} · {s.agendamento.servico.nome} · {s.agendamento.duracaoMinutos} min</span>
+                <span className="font-medium">{s.agendamento.cliente.nome} · {s.agendamento.servicos.map((servico) => servico.nome).join(', ')} · {s.agendamento.duracaoMinutos} min</span>
                 <span className="texto-corpo-pequeno text-texto-secundario">
                   {s.agendamento.status === 'concluido' ? 'Concluído' : 'Agendado'}
                   {s.agendamento.statusPagamento === 'pendente' ? ' · Pendente' : ''}

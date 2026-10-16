@@ -52,7 +52,7 @@ export default function ClientsPage() {
                     </td>
                     <td className="px-4 py-3 tabular-nums text-texto-secundario">{c.telefone}</td>
                     <td className="px-4 py-3 tabular-nums text-texto-secundario">{c.ultimaVisitaEm ? formatDate(c.ultimaVisitaEm) : '—'}</td>
-                    <td className="px-4 py-3">{c.valorPendenteCentavos > 0 ? <PaymentBadge status="pendente" valorCentavos={c.valorPendenteCentavos} /> : <span className="text-texto-secundario">—</span>}</td>
+                    <td className="px-4 py-3">{c.valorPendente > 0 ? <PaymentBadge status="pendente" /> : <span className="text-texto-secundario">—</span>}</td>
                     <td className="pr-4"><ChevronRight className="size-5 text-texto-secundario" aria-hidden /></td>
                   </tr>
                 ))}

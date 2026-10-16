@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToast } from '@/shared/ui'
 
 /** Mutation com invalidação de cache e toast de feedback (RNF05). */
-export function useAppMutation({ mutationFn, invalidate = [], successMessage, errorMessage = 'Não foi possível salvar. Tente novamente.', onSuccess }) {
+export function useAppMutation({ mutationFn, invalidate = [], successMessage, errorMessage = 'Não foi possível salvar. Tente novamente.', onSuccess, suppressConflict = false }) {
   const qc = useQueryClient()
   const toast = useToast()
   return useMutation({
@@ -14,7 +14,7 @@ export function useAppMutation({ mutationFn, invalidate = [], successMessage, er
       onSuccess?.(data, vars)
     },
     onError: (err) => {
-      if (err?.code !== 'conflict') toast(errorMessage, 'error')
+      if (err?.code !== 'conflict' || !suppressConflict) toast(err?.message || errorMessage, 'error')
     },
   })
 }

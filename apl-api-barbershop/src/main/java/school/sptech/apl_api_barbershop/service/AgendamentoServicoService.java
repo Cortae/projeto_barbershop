@@ -39,8 +39,16 @@ public class AgendamentoServicoService {
 
         if(agendamentoServicoRepository.existsByAgendamentoIdAgendamento(agendamento.getIdAgendamento())){
             agendamentoServicoRepository.deleteByAgendamentoIdAgendamento(agendamento.getIdAgendamento());
+            agendamentoServicoRepository.flush();
         }
 
         vincularAgendamentoServico(agendamento, servicos);
+    }
+
+    public List<AgendamentoServico> buscarPorAgendamentos(List<Integer> idsAgendamentos) {
+        if (idsAgendamentos.isEmpty()) {
+            return List.of();
+        }
+        return agendamentoServicoRepository.findAllByAgendamentoIdAgendamentoIn(idsAgendamentos);
     }
 }

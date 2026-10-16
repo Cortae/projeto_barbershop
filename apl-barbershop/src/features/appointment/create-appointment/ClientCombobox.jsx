@@ -7,7 +7,7 @@ export default function ClientCombobox({ clients, value, onChange, error, disabl
   const [query, setQuery] = useState(selected?.nome ?? '')
   const [open, setOpen] = useState(false)
   const q = query.trim().toLowerCase()
-  const matches = clients.filter((c) => c.nome.toLowerCase().includes(q) || c.telefone.includes(q)).slice(0, 6)
+  const matches = clients.filter((c) => c.nome.toLowerCase().includes(q) || (c.telefone ?? '').includes(q)).slice(0, 6)
 
   return (
     <div className="relative flex flex-col gap-2">

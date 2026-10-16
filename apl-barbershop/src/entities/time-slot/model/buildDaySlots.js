@@ -47,7 +47,10 @@ export function freeStartTimes(date, hours, durationMin, isFree) {
   const out = []
   for (let m = open; m + durationMin <= close; m += STEP) {
     const time = minutesToTime(m)
-    out.push({ horario: time, livre: isFree(`${date}T${time}`) })
+    const intervalStart = hours.inicioIntervalo ? timeToMinutes(hours.inicioIntervalo) : null
+    const intervalEnd = hours.fimIntervalo ? timeToMinutes(hours.fimIntervalo) : null
+    const overlapsInterval = intervalStart != null && intervalEnd != null && m < intervalEnd && intervalStart < m + durationMin
+    out.push({ horario: time, livre: !overlapsInterval && isFree(`${date}T${time}`) })
   }
   return out
 }

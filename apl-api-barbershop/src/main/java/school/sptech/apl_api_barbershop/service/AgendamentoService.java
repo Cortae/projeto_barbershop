@@ -1,15 +1,19 @@
 package school.sptech.apl_api_barbershop.service;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 import school.sptech.apl_api_barbershop.dto.AgendamentoCadastroRequestDto;
 import school.sptech.apl_api_barbershop.dto.AtualizarServicosAgendamentoRequestDto;
 import school.sptech.apl_api_barbershop.dto.RemarcarAgendamentoRequestDto;
+import school.sptech.apl_api_barbershop.dto.agendamento.AgendamentoResponse;
+import school.sptech.apl_api_barbershop.dto.agendamento.EditarAgendamentoRequest;
 import school.sptech.apl_api_barbershop.dto.pagamento.PagarRequest;
 import school.sptech.apl_api_barbershop.entity.*;
+import school.sptech.apl_api_barbershop.exception.BadRequestException;
+import school.sptech.apl_api_barbershop.exception.BusinessConflictException;
+import school.sptech.apl_api_barbershop.exception.NotFoundException;
+import school.sptech.apl_api_barbershop.mapper.agendamento.AgendamentoMapper;
 import school.sptech.apl_api_barbershop.repository.*;
 
 import java.math.BigDecimal;
@@ -17,246 +21,285 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class AgendamentoService {
-
-
     private final AgendamentoRepository agendamentoRepository;
     private final ServicoRepository servicoRepository;
     private final StatusAgendamentoService statusAgendamentoService;
     private final ClienteRepository clienteRepository;
     private final PagamentoService pagamentoService;
+    private final PagamentoRepository pagamentoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final BloqueioRepository bloqueioRepository;
     private final AgendamentoServicoService agendamentoServicoService;
+    private final AgendamentoMapper agendamentoMapper;
 
-    public AgendamentoService(AgendamentoRepository agendamentoRepository,
-                              ServicoRepository servicoRepository,
-                              StatusAgendamentoService statusAgendamentoService,
-                              ClienteRepository clienteRepository,
-                              PagamentoService pagamentoService,
-                              UsuarioRepository usuarioRepository,
-                              AgendamentoServicoService agendamentoServicoService) {
+    public AgendamentoService(
+            AgendamentoRepository agendamentoRepository,
+            ServicoRepository servicoRepository,
+            StatusAgendamentoService statusAgendamentoService,
+            ClienteRepository clienteRepository,
+            PagamentoService pagamentoService,
+            PagamentoRepository pagamentoRepository,
+            UsuarioRepository usuarioRepository,
+            BloqueioRepository bloqueioRepository,
+            AgendamentoServicoService agendamentoServicoService,
+            AgendamentoMapper agendamentoMapper
+    ) {
         this.agendamentoRepository = agendamentoRepository;
         this.servicoRepository = servicoRepository;
         this.statusAgendamentoService = statusAgendamentoService;
         this.clienteRepository = clienteRepository;
         this.pagamentoService = pagamentoService;
+        this.pagamentoRepository = pagamentoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.bloqueioRepository = bloqueioRepository;
         this.agendamentoServicoService = agendamentoServicoService;
+        this.agendamentoMapper = agendamentoMapper;
     }
 
-    public List<Agendamento> buscarPorBarbeiro(Integer id) {
-        return agendamentoRepository.findAllByBarbeiro(id);
+    @Transactional(readOnly = true)
+    public List<AgendamentoResponse> buscarPorBarbeiro(Integer id) {
+        if (!usuarioRepository.existsById(id)) throw new NotFoundException("Barbeiro não encontrado");
+        return toResponse(agendamentoRepository.findAllByBarbeiro_IdOrderByHorarioInicioAsc(id));
     }
 
-    public Agendamento atualizarStatus(Integer id, String acao) {
+    @Transactional
+    public AgendamentoResponse atualizarStatus(Integer id, String acao) {
+        return toResponse(atualizarStatusEntidade(id, acao));
+    }
 
-        if(!existeAgendamento(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento não encontrado.");
+    private Agendamento atualizarStatusEntidade(Integer id, String acao) {
+        Agendamento agendamento = buscarEntidade(id);
+        if (!statusAgendamentoService.existeStatusContaining(acao)) {
+            throw new BadRequestException("Status não permitido");
         }
-        if(!statusAgendamentoService.existeStatusContaining(acao)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status não permitido.");
-        }
-
-        StatusAgendamento status = statusAgendamentoService.buscaStatus(acao);
-        Agendamento agendamento = agendamentoRepository.findById(id).get();
-
-        agendamento.setStatusAgendamento(status);
-
+        agendamento.setStatusAgendamento(statusAgendamentoService.buscaStatus(acao));
         return agendamentoRepository.save(agendamento);
-
     }
 
-    public Agendamento concluir(Integer id, PagarRequest request) {
-
-        if(!existeAgendamento(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento não encontrado");
+    @Transactional
+    public AgendamentoResponse concluir(Integer id, Integer formaPagamentoId) {
+        Agendamento agendamento = buscarEntidade(id);
+        if (status(agendamento).equals("CANCELADO")) {
+            throw new BusinessConflictException("Agendamento cancelado não pode ser concluído");
         }
-
-        atualizarStatus(id, "CONCLUIDO");
-        if(request != null){
-            request.setIdAgendamento(id);
-            registrarPagamento(request);
+        if (status(agendamento).equals("CONCLUIDO")) {
+            throw new BusinessConflictException("Agendamento já foi concluído");
         }
-
-        return buscarPorId(id).get();
-
+        agendamento.setStatusAgendamento(statusAgendamentoService.buscaStatus("CONCLUIDO"));
+        agendamentoRepository.save(agendamento);
+        if (formaPagamentoId != null) {
+            pagamentoService.marcarComoPago(agendamento.getPagamento().getId(), formaPagamentoId);
+        }
+        return toResponse(agendamento);
     }
 
-    public List<Agendamento> listarPorPeriodo(LocalDate de, LocalDate ate) {
-
-        return agendamentoRepository.findByHorarioInicioBetweenOrderByHorarioInicioAsc( de.atStartOfDay(), ate.atTime(LocalTime.MAX));
+    @Transactional(readOnly = true)
+    public List<AgendamentoResponse> listarPorPeriodo(LocalDate de, LocalDate ate) {
+        return toResponse(agendamentoRepository.findByHorarioInicioBetweenOrderByHorarioInicioAsc(
+                de.atStartOfDay(), ate.atTime(LocalTime.MAX)));
     }
-
 
     public boolean existeCliente(Integer id) {
         return clienteRepository.existsById(id);
     }
 
-    public List<Agendamento> buscarAgendamentosPorCliente(Integer id) {
-
-        return agendamentoRepository.findByClienteId(id);
+    @Transactional(readOnly = true)
+    public List<AgendamentoResponse> buscarAgendamentosPorCliente(Integer id) {
+        return toResponse(agendamentoRepository
+                .findByCliente_IdAndStatusAgendamento_TituloIgnoreCaseOrderByHorarioInicioDesc(id, "CONCLUIDO"));
     }
 
-    public Agendamento cadastrar(@Valid AgendamentoCadastroRequestDto agendamentoDto) {
+    @Transactional
+    public AgendamentoResponse cadastrar(@Valid AgendamentoCadastroRequestDto request) {
+        Cliente cliente = clienteRepository.findById(request.getCliente())
+                .orElseThrow(() -> new BadRequestException("Cliente não encontrado"));
+        Usuario barbeiro = usuarioRepository.findById(request.getBarbeiro())
+                .orElseThrow(() -> new BadRequestException("Barbeiro não encontrado"));
+        List<Servico> servicos = buscarServicosValidos(request.getServicos());
+        Totais totais = calcularTotais(servicos);
+        LocalDateTime fim = request.getInicio().plusMinutes(totais.getDuracao());
+        validarDisponibilidade(request.getInicio(), fim, barbeiro.getId(), null);
 
-        if(agendamentoRepository.existeAgendamentoAtivo(agendamentoDto.getInicio(), agendamentoDto.getBarbeiro())){
-            throw new ResponseStatusException( HttpStatus.CONFLICT, "Horário já ocupado");
-        }
-
-        Agendamento agendamento = agendamentoRepository.save(cadastroRequestDtoToAgendamento(agendamentoDto));
-
-        agendamentoServicoService.vincularAgendamentoServico(agendamento, buscarServicosRelacionados(agendamentoDto.getServicos()));
-
-        return agendamento;
-
-    }
-
-    private List<Servico> buscarServicosRelacionados (List<Integer> idServicos){
-
-        List<Servico> servicos = new ArrayList<>();
-
-        idServicos.stream().forEach(
-                servico -> {
-                    Optional<Servico> busca = servicoRepository.findById(servico);
-                    if(!busca.isEmpty()){
-                        servicos.add(busca.get());
-                    }
-                });
-
-        return servicos;
-    }
-
-    private Agendamento cadastroRequestDtoToAgendamento(AgendamentoCadastroRequestDto agendamento){
-
-
-        Optional<Cliente> cliente = clienteRepository.findById(agendamento.getCliente());
-        Optional<Usuario> barbeiro = usuarioRepository.findById(agendamento.getBarbeiro());
-
-        List<Servico> servicos = buscarServicosRelacionados(agendamento.getServicos());
-
-        if( cliente.isEmpty() ){
-            throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Cliente não encontrado");
-        }else if( barbeiro.isEmpty() ){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Barbeiro não encontrado");
-        }else if( servicos.isEmpty() ){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Serviço não encontrado");
-        }
-
-        BigDecimal valorTotal = new BigDecimal(0);
-        Integer duracaoTotal = 0;
-
-        for(Servico servico : servicos){
-            duracaoTotal += servico.getDuracaoAtual();
-            valorTotal = valorTotal.add(servico.getValorAtual());
-        }
-
-        Pagamento pagamento = pagamentoService.registrar(valorTotal);
-
-        LocalDateTime fimAtendimento = agendamento.getInicio().plusMinutes((long) duracaoTotal);
-        StatusAgendamento status = statusAgendamentoService.buscaStatus("agendado");
-        String titulo = cliente.get().getNome() + " - Duração: "+ duracaoTotal+ "min";
-
-
-
-        return new Agendamento(
-                null,
-                agendamento.getInicio(),
-                fimAtendimento,
-                titulo,
-                status,
-                barbeiro.get(),
-                cliente.get(),
-                pagamento
+        Pagamento pagamento = pagamentoService.registrar(totais.getValor());
+        Agendamento agendamento = new Agendamento(
+                null, request.getInicio(), fim, titulo(cliente, totais.getDuracao()),
+                statusAgendamentoService.buscaStatus("AGENDADO"), barbeiro, cliente, pagamento
         );
+        agendamento = agendamentoRepository.save(agendamento);
+        agendamentoServicoService.vincularAgendamentoServico(agendamento, servicos);
+        return toResponse(agendamento);
     }
 
-    public Agendamento atualizarServicosAgendamento(AtualizarServicosAgendamentoRequestDto request) {
+    @Transactional
+    public AgendamentoResponse editar(Integer id, EditarAgendamentoRequest request) {
+        Agendamento agendamento = buscarEntidade(id);
+        validarEditavel(agendamento);
+        Cliente cliente = clienteRepository.findById(request.getCliente())
+                .orElseThrow(() -> new BadRequestException("Cliente não encontrado"));
+        List<Servico> servicos = buscarServicosValidos(request.getServicos());
+        Totais totais = calcularTotais(servicos);
+        LocalDateTime fim = request.getInicio().plusMinutes(totais.getDuracao());
+        validarDisponibilidade(request.getInicio(), fim, agendamento.getBarbeiro().getId(), id);
 
-        Optional<Agendamento> agendamento = agendamentoRepository.findById(request.getIdAgendamento());
-
-        if(agendamento.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Agendamento não encontrado");
-        }
-
-        List<Servico> servicos = buscarServicosRelacionados(request.getServicos());
-
-        if(servicos.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nenhum serviço válido");
-        }
-
-        agendamentoServicoService.atualizarServicos(agendamento.get(), servicos);
-
-        return agendamentoRepository.findById(request.getIdAgendamento()).get();
-
-    }
-
-    public Agendamento remarcarAgendamento(@Valid RemarcarAgendamentoRequestDto request) {
-
-        Agendamento agendamento = agendamentoRepository.findById(request.getIdAgendamento())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Agendamento não encontrado"));
-
-        long duracaoMinutos = Duration.between(
-                agendamento.getHorarioInicio(), agendamento.getHorarioFim()).toMinutes();
-        LocalDateTime novoFim = request.getInicio().plusMinutes(duracaoMinutos);
-
-        if(agendamentoRepository.existeConflitoHorario(
-                request.getInicio(),
-                novoFim,
-                agendamento.getBarbeiro().getId(),
-                agendamento.getIdAgendamento())){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Horário já ocupado para esse barbeiro.");
-        }
-
+        agendamento.setCliente(cliente);
         agendamento.setHorarioInicio(request.getInicio());
-        agendamento.setHorarioFim(novoFim);
-
-        return agendamentoRepository.save(agendamento);
+        agendamento.setHorarioFim(fim);
+        agendamento.setTitulo(titulo(cliente, totais.getDuracao()));
+        atualizarPagamentoPendente(agendamento, totais.getValor());
+        agendamentoRepository.save(agendamento);
+        agendamentoServicoService.atualizarServicos(agendamento, servicos);
+        return toResponse(agendamento);
     }
 
-    public boolean validarDisponibilidade(LocalDateTime horarioInicio, Integer idBarbeiro){
-        return agendamentoRepository.existeAgendamentoAtivo(horarioInicio, idBarbeiro);
+    @Transactional
+    public AgendamentoResponse atualizarServicosAgendamento(AtualizarServicosAgendamentoRequestDto request) {
+        Agendamento agendamento = buscarEntidade(request.getIdAgendamento());
+        validarEditavel(agendamento);
+        List<Servico> servicos = buscarServicosValidos(request.getServicos());
+        Totais totais = calcularTotais(servicos);
+        LocalDateTime fim = agendamento.getHorarioInicio().plusMinutes(totais.getDuracao());
+        validarDisponibilidade(agendamento.getHorarioInicio(), fim, agendamento.getBarbeiro().getId(), agendamento.getIdAgendamento());
+
+        agendamento.setHorarioFim(fim);
+        agendamento.setTitulo(titulo(agendamento.getCliente(), totais.getDuracao()));
+        atualizarPagamentoPendente(agendamento, totais.getValor());
+        agendamentoRepository.save(agendamento);
+        agendamentoServicoService.atualizarServicos(agendamento, servicos);
+        return toResponse(agendamento);
     }
 
-    public Agendamento registrarPagamento(PagarRequest request) {
+    @Transactional
+    public AgendamentoResponse remarcarAgendamento(@Valid RemarcarAgendamentoRequestDto request) {
+        Agendamento agendamento = buscarEntidade(request.getIdAgendamento());
+        validarEditavel(agendamento);
+        long duracao = Duration.between(agendamento.getHorarioInicio(), agendamento.getHorarioFim()).toMinutes();
+        LocalDateTime fim = request.getInicio().plusMinutes(duracao);
+        validarDisponibilidade(request.getInicio(), fim, agendamento.getBarbeiro().getId(), agendamento.getIdAgendamento());
+        agendamento.setHorarioInicio(request.getInicio());
+        agendamento.setHorarioFim(fim);
+        return toResponse(agendamentoRepository.save(agendamento));
+    }
 
-        if(!existeAgendamento(request.getIdAgendamento())){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento não encontrado");
+    public void validarDisponibilidade(LocalDateTime inicio, LocalDateTime fim, Integer barbeiroId, Integer ignorarId) {
+        if (agendamentoRepository.existeConflitoHorario(inicio, fim, barbeiroId, ignorarId)) {
+            throw new BusinessConflictException("Horário já ocupado para esse barbeiro");
         }
-        Agendamento agendamento = buscarPorId(request.getIdAgendamento()).get();
-
-        if(!agendamentoEstaConcluido(request.getIdAgendamento())){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento precisa estar conclúido para pagar");
+        if (bloqueioRepository.existsByUsuarioIdAndInicioLessThanAndFimGreaterThan(barbeiroId, fim, inicio)) {
+            throw new BusinessConflictException("O horário coincide com um bloqueio da agenda");
         }
+    }
 
+    @Transactional
+    public AgendamentoResponse registrarPagamento(PagarRequest request) {
+        Agendamento agendamento = buscarEntidade(request.getIdAgendamento());
+        if (!status(agendamento).equals("CONCLUIDO")) {
+            throw new BusinessConflictException("Agendamento precisa estar concluído para pagar");
+        }
         pagamentoService.marcarComoPago(agendamento.getPagamento().getId(), request.getFormaPagamentoId());
-
-        return buscarPorId(request.getIdAgendamento()).get();
+        return toResponse(agendamento);
     }
 
-
-
-    public boolean existeAgendamento(Integer id){
+    public boolean existeAgendamento(Integer id) {
         return agendamentoRepository.existsById(id);
     }
 
-    public boolean agendamentoEstaConcluido(Integer id){
-
-        if(!existeAgendamento(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento não encontrado.");
-        }
-        Agendamento agendamento = agendamentoRepository.findById(id).get();
-
-        return agendamento.getStatusAgendamento().getTitulo().equalsIgnoreCase("CONCLUIDO") ? true : false;
+    public boolean agendamentoEstaConcluido(Integer id) {
+        return status(buscarEntidade(id)).equals("CONCLUIDO");
     }
 
-    public Optional<Agendamento> buscarPorId(Integer id) {
+    @Transactional(readOnly = true)
+    public java.util.Optional<AgendamentoResponse> buscarPorId(Integer id) {
+        return agendamentoRepository.findById(id).map(this::toResponse);
+    }
 
-        return agendamentoRepository.findById(id);
+    private Agendamento buscarEntidade(Integer id) {
+        return agendamentoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Agendamento não encontrado"));
+    }
+
+    private List<Servico> buscarServicosValidos(List<Integer> ids) {
+        if (ids == null || ids.isEmpty() || ids.stream().anyMatch(java.util.Objects::isNull)) {
+            throw new BadRequestException("Informe ao menos um serviço");
+        }
+        if (ids.stream().distinct().count() != ids.size()) {
+            throw new BadRequestException("A lista de serviços não pode conter itens repetidos");
+        }
+        Map<Integer, Servico> encontrados = servicoRepository.findAllById(ids).stream()
+                .collect(Collectors.toMap(Servico::getId, Function.identity()));
+        if (encontrados.size() != ids.size()) {
+            throw new BadRequestException("Um ou mais serviços não foram encontrados");
+        }
+        List<Servico> servicos = ids.stream().map(encontrados::get).toList();
+        if (servicos.stream().anyMatch(servico -> !Boolean.TRUE.equals(servico.getAtivo()))) {
+            throw new BadRequestException("Um ou mais serviços não estão disponíveis");
+        }
+        return servicos;
+    }
+
+    private Totais calcularTotais(List<Servico> servicos) {
+        BigDecimal valor = servicos.stream().map(Servico::getValorAtual).reduce(BigDecimal.ZERO, BigDecimal::add);
+        int duracao = servicos.stream().mapToInt(Servico::getDuracaoAtual).sum();
+        return new Totais(valor, duracao);
+    }
+
+    private void atualizarPagamentoPendente(Agendamento agendamento, BigDecimal valor) {
+        if (agendamento.getPagamento().isPago()) {
+            throw new BusinessConflictException("Não é possível alterar serviços de um pagamento já realizado");
+        }
+        agendamento.getPagamento().setValor(valor);
+        pagamentoRepository.save(agendamento.getPagamento());
+    }
+
+    private void validarEditavel(Agendamento agendamento) {
+        if (List.of("CANCELADO", "CONCLUIDO", "NAO_COMPARECEU").contains(status(agendamento))) {
+            throw new BusinessConflictException("Este agendamento não pode mais ser editado");
+        }
+    }
+
+    private String status(Agendamento agendamento) {
+        return agendamento.getStatusAgendamento().getTitulo().toUpperCase();
+    }
+
+    private String titulo(Cliente cliente, int duracao) {
+        return cliente.getNome() + " - Duração: " + duracao + "min";
+    }
+
+    private AgendamentoResponse toResponse(Agendamento agendamento) {
+        return toResponse(List.of(agendamento)).getFirst();
+    }
+
+    private List<AgendamentoResponse> toResponse(List<Agendamento> agendamentos) {
+        List<Integer> ids = agendamentos.stream().map(Agendamento::getIdAgendamento).toList();
+        Map<Integer, List<AgendamentoServico>> porAgendamento = agendamentoServicoService.buscarPorAgendamentos(ids)
+                .stream().collect(Collectors.groupingBy(
+                        item -> item.getAgendamento().getIdAgendamento(), LinkedHashMap::new, Collectors.toList()));
+        return agendamentos.stream().map(agendamento -> agendamentoMapper.toResponse(
+                agendamento, porAgendamento.getOrDefault(agendamento.getIdAgendamento(), List.of()))).toList();
+    }
+
+    private static class Totais {
+        private final BigDecimal valor;
+        private final int duracao;
+
+        public Totais(BigDecimal valor, int duracao) {
+            this.valor = valor;
+            this.duracao = duracao;
+        }
+
+        public BigDecimal getValor() {
+            return valor;
+        }
+
+        public int getDuracao() {
+            return duracao;
+        }
     }
 }

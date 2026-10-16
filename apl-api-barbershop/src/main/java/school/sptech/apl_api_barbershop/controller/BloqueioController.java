@@ -30,7 +30,7 @@ public class BloqueioController {
         BloqueioResponse response = bloqueioService.criar(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(response.id())
+                .buildAndExpand(response.getId())
                 .toUri();
         return ResponseEntity.created(location).body(response);
     }

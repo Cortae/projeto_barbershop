@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router'
 import { ChevronRight } from 'lucide-react'
-import { formatCurrency } from '@/shared/lib/format'
+import { formatMoney } from '@/shared/lib/format'
 import { ROUTES } from '@/shared/config'
 
 function Kpi({ label, value, tone = 'text-texto', highlight, onClick }) {
@@ -10,7 +10,7 @@ function Kpi({ label, value, tone = 'text-texto', highlight, onClick }) {
       <span className="texto-label flex items-center justify-between text-texto-secundario">
         {label} {onClick && <ChevronRight className="size-5" aria-hidden />}
       </span>
-      <span className={`texto-kpi ${tone} text-[26px] sm:text-[32px]`}>{formatCurrency(value)}</span>
+      <span className={`texto-kpi ${tone} text-[26px] sm:text-[32px]`}>{formatMoney(value)}</span>
     </>
   )
   return onClick ? (
@@ -24,10 +24,10 @@ export default function FinanceKpis({ summary }) {
   const navigate = useNavigate()
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-6">
-      <Kpi label="Lucro bruto" value={summary.valorBrutoCentavos} />
-      <Kpi label="Despesas" value={summary.despesasCentavos} onClick={() => navigate(ROUTES.expenses)} />
-      <Kpi label="Lucro líquido" value={summary.valorLiquidoCentavos} tone="text-primaria" highlight />
-      <Kpi label="A receber" value={summary.valorAReceberCentavos} tone="text-alerta" />
+      <Kpi label="Lucro bruto" value={summary.valorBruto} />
+      <Kpi label="Despesas" value={summary.despesas} onClick={() => navigate(ROUTES.expenses)} />
+      <Kpi label="Lucro líquido" value={summary.valorLiquido} tone="text-primaria" highlight />
+      <Kpi label="A receber" value={summary.valorAReceber} tone="text-alerta" />
     </div>
   )
 }

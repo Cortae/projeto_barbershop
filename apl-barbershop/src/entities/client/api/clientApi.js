@@ -1,27 +1,33 @@
 import { useQuery } from '@tanstack/react-query'
-import { db, request, nextId } from '@/shared/api'
+import { apiRequest } from '@/shared/api'
 
-export const clientKeys = { all: ['clients'], detail: (id) => ['clients', id] }
+export const clientKeys = { all: ['clients'], detail: (id) => ['clients', Number(id)] }
 
-function enrich(c) {
-  const done = db.agendamentos.filter((a) => a.clienteId === c.id && a.status === 'concluido')
-  const last = done.map((a) => a.horarioInicio).sort().at(-1)
-  const pendingCents = done.filter((a) => a.statusPagamento === 'pendente').reduce((s, a) => s + a.valorCentavos, 0)
-  return { ...c, ultimaVisitaEm: last ?? null, valorPendenteCentavos: pendingCents }
-}
+const mapClient = (client) => ({
+  ...client,
+  telefone: client.telefone ?? client.celular ?? '',
+  dataNascimento: client.nascimento ?? '',
+  ultimaVisitaEm: client.ultimaVisitaEm ?? client.ultimoCorte ?? null,
+  valorPendente: Number(client.valorPendente ?? client.totalPendente ?? 0),
+})
 
-export const fetchClients = () => request(() => db.clientes.map(enrich).sort((a, b) => a.nome.localeCompare(b.nome)))
-export const fetchClient = (id) => request(() => enrich(db.clientes.find((c) => c.id === id)))
-export const saveClient = (data) =>
-  request(() => {
-    if (data.id) {
-      Object.assign(db.clientes.find((c) => c.id === data.id), data)
-      return data
-    }
-    const c = { ...data, id: nextId('c') }
-    db.clientes.push(c)
-    return c
-  })
+const payload = (client) => ({
+  nome: client.nome,
+  apelido: client.apelido || null,
+  celular: client.telefone.replace(/\D/g, ''),
+  nascimento: client.dataNascimento || null,
+})
+
+export const fetchClients = () => apiRequest('/clientes').then((items) => items.map(mapClient))
+export const fetchClient = (id) => apiRequest(`/clientes/${Number(id)}`).then(mapClient)
+export const saveClient = (client) => apiRequest(client.id ? `/clientes/${Number(client.id)}` : '/clientes', {
+  method: client.id ? 'PUT' : 'POST',
+  body: JSON.stringify(payload(client)),
+}).then(mapClient)
 
 export const useClients = () => useQuery({ queryKey: clientKeys.all, queryFn: fetchClients })
-export const useClient = (id) => useQuery({ queryKey: clientKeys.detail(id), queryFn: () => fetchClient(id), enabled: !!id })
+export const useClient = (id) => useQuery({
+  queryKey: clientKeys.detail(id),
+  queryFn: () => fetchClient(id),
+  enabled: Boolean(id),
+})

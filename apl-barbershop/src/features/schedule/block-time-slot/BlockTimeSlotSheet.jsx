@@ -12,6 +12,7 @@ export default function BlockTimeSlotSheet({ open, onClose, date }) {
     successMessage: 'Horário bloqueado.',
     errorMessage: 'Não foi possível salvar o bloqueio. Tente novamente.',
     onSuccess: onClose,
+    suppressConflict: true,
   })
   const set = (k) => (e) => {
     setForm((f) => ({ ...f, [k]: e.target.value }))
