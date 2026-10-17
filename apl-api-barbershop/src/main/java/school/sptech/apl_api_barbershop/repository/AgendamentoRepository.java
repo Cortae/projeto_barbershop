@@ -33,8 +33,18 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Intege
             @Param("agendamentoId") Integer agendamentoId
     );
 
+    List<Agendamento> findByClienteId(Integer id);
+           
     List<Agendamento> findByCliente_IdAndStatusAgendamento_TituloIgnoreCaseOrderByHorarioInicioDesc(
             Integer id,
             String status
     );
+           
+    @Query("""
+        SELECT a FROM Agendamento a
+        JOIN a.pagamento p ON p.pago = false
+        JOIN a.statusAgendamento s ON s.titulo = 'CONCLUIDO'
+        ORDER BY a.horarioInicio
+        """)
+    List<Agendamento> buscarPagamentosPendentes();
 }
