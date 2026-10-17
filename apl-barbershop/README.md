@@ -26,11 +26,15 @@ npm install
 
 ## Desenvolvimento
 
+Inicie primeiro o backend em `http://localhost:8080`. Depois, no frontend:
+
 ```bash
 npm run dev
 ```
 
-A aplicação utiliza `http://localhost:5173` por padrão. A variável de ambiente `PORT` pode sobrescrever essa porta.
+A aplicação utiliza `http://localhost:5173` por padrão. A variável de ambiente `PORT` pode sobrescrever essa porta. Em desenvolvimento, `/api` é encaminhado pelo Vite para `http://localhost:8080`; `API_PROXY_TARGET` permite alterar esse destino.
+
+Copie `.env.example` para `.env.local` quando precisar personalizar o ambiente. Em homologação ou produção, defina `VITE_API_URL` com a URL pública do backend antes do build.
 
 ## Scripts
 
@@ -38,6 +42,7 @@ A aplicação utiliza `http://localhost:5173` por padrão. A variável de ambien
 - `npm run build`: gera o build de produção.
 - `npm run preview`: abre localmente o build de produção.
 - `npm run lint`: verifica problemas no JavaScript e JSX sem alterar arquivos.
+- `npm test`: executa os testes automatizados do frontend.
 - `npm run lint:fix`: corrige automaticamente os problemas de lint que possuem solução segura.
 - `npm run format`: formata o código-fonte com o oxfmt.
 - `npm run format:check`: verifica a formatação do código-fonte sem alterar arquivos.
@@ -75,6 +80,6 @@ Consulte `docs/especificacao-arquitetura-fsd.md` para mais detalhes.
 
 ## Estado atual
 
-O projeto ainda usa dados simulados em memória em `src/shared/api/mockDb.js`. O login com Google também é uma simulação local. Dados cadastrados ou alterados são perdidos quando a página é recarregada; somente a sessão é armazenada no `localStorage`.
+O fluxo de agendamentos, clientes, serviços, formas de pagamento e bloqueios usa o backend Spring Boot. O login ainda é uma simulação local associada ao barbeiro de ID `2`.
 
-Antes de publicar a aplicação, será necessário conectar um back-end real, configurar autenticação e preparar o servidor de hospedagem para redirecionar rotas da SPA para `index.html`.
+O expediente e as despesas ainda utilizam dados locais. A API de expediente foi deliberadamente adiada; sua edição não é exibida enquanto não houver persistência no backend.

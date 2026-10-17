@@ -1,12 +1,13 @@
 package school.sptech.apl_api_barbershop.dto.pagamento;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class PagarRequest {
 
-    @NotNull
+    @NotNull @Positive
     private Integer idAgendamento;
-    @NotNull(message = "A forma de pagamento é obrigatória")
+    @NotNull(message = "A forma de pagamento é obrigatória") @Positive
     private Integer formaPagamentoId;
 
     public PagarRequest() {

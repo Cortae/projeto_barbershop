@@ -11,7 +11,7 @@ export default function ClientCard({ client, onClick }) {
         <span className="texto-corpo-pequeno text-texto-secundario">
           Último corte: {client.ultimaVisitaEm ? formatDate(client.ultimaVisitaEm) : '—'}
         </span>
-        {client.valorPendenteCentavos > 0 && <PaymentBadge status="pendente" valorCentavos={client.valorPendenteCentavos} />}
+        {client.valorPendente > 0 && <PaymentBadge status="pendente" />}
       </div>
     </Card>
   )

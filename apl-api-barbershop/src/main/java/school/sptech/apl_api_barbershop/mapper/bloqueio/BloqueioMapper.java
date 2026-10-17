@@ -12,9 +12,9 @@ public final class BloqueioMapper {
     public static Bloqueio toEntity(BloqueioRequest request, Usuario usuario) {
         Bloqueio bloqueio = new Bloqueio();
         bloqueio.setUsuario(usuario);
-        bloqueio.setInicio(request.inicio());
-        bloqueio.setFim(request.fim());
-        bloqueio.setMotivo(request.motivo());
+        bloqueio.setInicio(request.getInicio());
+        bloqueio.setFim(request.getFim());
+        bloqueio.setMotivo(request.getMotivo());
         return bloqueio;
     }
 

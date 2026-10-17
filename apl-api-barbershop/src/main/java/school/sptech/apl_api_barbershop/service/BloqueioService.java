@@ -1,6 +1,7 @@
 package school.sptech.apl_api_barbershop.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.sptech.apl_api_barbershop.dto.bloqueio.BloqueioRequest;
 import school.sptech.apl_api_barbershop.dto.bloqueio.BloqueioResponse;
 import school.sptech.apl_api_barbershop.entity.Bloqueio;
@@ -34,26 +35,26 @@ public class BloqueioService {
     }
 
     // Métodos principais
+    @Transactional
     public BloqueioResponse criar(BloqueioRequest request) {
         validarPeriodo(request);
 
-        Usuario usuario = buscarUsuario(request.usuarioId());
+        Usuario usuario = buscarUsuario(request.getUsuarioId());
 
         if (bloqueioRepository.existsByUsuarioIdAndInicioLessThanAndFimGreaterThan(
-                request.usuarioId(), request.fim(), request.inicio()
+                request.getUsuarioId(), request.getFim(), request.getInicio()
         )) {
             throw new BusinessConflictException("Já existe um bloqueio sobreposto para esse barbeiro.");
         }
 
-        if (agendamentoService.validarDisponibilidade(request.inicio(), request.usuarioId())) {
-            throw new BusinessConflictException("Já existe atendimento nesse horário. Remarque ou cancele antes de bloquear.");
-        }
+        agendamentoService.validarDisponibilidade(request.getInicio(), request.getFim(), request.getUsuarioId(), null);
 
         Bloqueio bloqueio = BloqueioMapper.toEntity(request, usuario);
         return BloqueioMapper.toResponse(bloqueioRepository.save(bloqueio));
     }
 
 
+    @Transactional(readOnly = true)
     public List<BloqueioResponse> listarPorPeriodo(Integer barbeiroId, LocalDateTime inicio, LocalDateTime fim) {
         if (inicio == null || fim == null || barbeiroId == null) {
             throw new BadRequestException("barbeiroId, inicio e fim são obrigatórios");
@@ -70,6 +71,7 @@ public class BloqueioService {
     }
 
 
+    @Transactional
     public void remover(Integer id) {
         Bloqueio bloqueio = bloqueioRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Bloqueio não encontrado"));
@@ -79,13 +81,13 @@ public class BloqueioService {
 
     // Métodos auxiliares
     private void validarPeriodo(BloqueioRequest request) {
-        if (request == null || request.usuarioId() == null || request.inicio() == null || request.fim() == null) {
+        if (request == null || request.getUsuarioId() == null || request.getInicio() == null || request.getFim() == null) {
             throw new BadRequestException("Usuário, início e fim são obrigatórios");
         }
-        if (!request.fim().isAfter(request.inicio())) {
+        if (!request.getFim().isAfter(request.getInicio())) {
             throw new BadRequestException("O fim deve ser depois do início");
         }
-        if (request.motivo() != null && request.motivo().length() > 100) {
+        if (request.getMotivo() != null && request.getMotivo().length() > 100) {
             throw new BadRequestException("O motivo deve ter no máximo 100 caracteres");
         }
     }

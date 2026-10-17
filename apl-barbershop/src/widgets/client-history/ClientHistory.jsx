@@ -1,6 +1,6 @@
 import { History } from 'lucide-react'
 import { EmptyState, SkeletonList, ErrorState } from '@/shared/ui'
-import { formatCurrency, formatDate } from '@/shared/lib/format'
+import { formatMoney, formatDate } from '@/shared/lib/format'
 import { useClientAppointments } from '@/entities/appointment'
 import { PaymentBadge } from '@/entities/payment'
 
@@ -17,8 +17,8 @@ export default function ClientHistory({ clienteId }) {
           {data.map((a) => (
             <li key={a.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 p-4">
               <span className="texto-corpo-pequeno tabular-nums text-texto-secundario">{formatDate(a.horarioInicio)}</span>
-              <span className="flex-1">{a.servico.nome}</span>
-              <span className="texto-valor">{formatCurrency(a.valorCentavos)}</span>
+              <span className="flex-1">{a.servicos.map((servico) => servico.nome).join(', ')}</span>
+              <span className="texto-valor">{formatMoney(a.valor)}</span>
               <PaymentBadge status={a.statusPagamento} />
             </li>
           ))}

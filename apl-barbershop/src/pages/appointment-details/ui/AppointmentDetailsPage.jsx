@@ -7,7 +7,7 @@ import { MarkAsPaidButton } from '@/features/appointment/mark-as-paid'
 import { useAppointment, AppointmentStatusBadge } from '@/entities/appointment'
 import { PaymentBadge, methodLabel } from '@/entities/payment'
 import { Card, Skeleton, ErrorState } from '@/shared/ui'
-import { formatCurrency, formatDayMonth, formatTime } from '@/shared/lib/format'
+import { formatMoney, formatDayMonth, formatTime } from '@/shared/lib/format'
 import { ROUTES } from '@/shared/config'
 
 export default function AppointmentDetailsPage() {
@@ -29,12 +29,16 @@ export default function AppointmentDetailsPage() {
                 <AppointmentStatusBadge status={a.status} />
                 <PaymentBadge status={a.statusPagamento} />
               </div>
+              <ul className="text-texto-secundario">
+                {a.servicos.map((servico) => (
+                  <li key={servico.id}>{servico.nome} · {servico.duracaoMinutos} min · {formatMoney(servico.valor)}</li>
+                ))}
+              </ul>
               <p className="text-texto-secundario tabular-nums">
-                {a.servico.nome} · {formatDayMonth(a.horarioInicio)} às {formatTime(a.horarioInicio)} · {a.duracaoMinutos} min
+                {formatDayMonth(a.horarioInicio)} às {formatTime(a.horarioInicio)} · {a.duracaoMinutos} min
               </p>
-              <p className="texto-kpi">{formatCurrency(a.valorCentavos)}</p>
+              <p className="texto-kpi">{formatMoney(a.valor)}</p>
               {a.formaPagamento && <p className="texto-corpo-pequeno text-texto-secundario">Forma de pagamento: {methodLabel(a.formaPagamento)}</p>}
-              {a.observacoes && <p className="texto-corpo-pequeno rounded-8 bg-superficie-elevada p-3">{a.observacoes}</p>}
             </Card>
 
             {a.status === 'agendado' && (

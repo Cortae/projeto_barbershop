@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { MoreHorizontal, Ban, Clock } from 'lucide-react'
+import { MoreHorizontal, Ban } from 'lucide-react'
 import { AppLayout } from '@/widgets/app-layout'
 import { DayGrid, WeekGrid, Legend } from '@/widgets/schedule-grid'
 import { useScheduleParams } from '@/features/schedule/switch-period-view'
 import { BlockTimeSlotSheet } from '@/features/schedule/block-time-slot'
-import { WorkingHoursSheet } from '@/features/schedule/configure-working-hours'
 import { useAppointments } from '@/entities/appointment'
 import { useBlocks, useWorkingHours } from '@/entities/time-slot'
 import { Button, Tabs, PeriodSelector, SkeletonList, ErrorState } from '@/shared/ui'
@@ -13,7 +12,7 @@ import { addDays, weekDays, weekdayLong, today } from '@/shared/lib/date'
 import { formatDayMonth } from '@/shared/lib/format'
 import { ROUTES } from '@/shared/config'
 
-function ScheduleMenu({ onBlock, onHours }) {
+function ScheduleMenu({ onBlock }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
   useEffect(() => {
@@ -33,7 +32,6 @@ function ScheduleMenu({ onBlock, onHours }) {
       {open && (
         <div role="menu" className="absolute right-0 top-full z-40 mt-2 w-52 rounded-12 border border-borda bg-superficie-elevada p-2">
           {item('Bloquear horário', Ban, onBlock)}
-          {item('Expediente', Clock, onHours)}
         </div>
       )}
     </div>
@@ -47,7 +45,7 @@ export default function SchedulePage() {
   const days = weekDays(date)
   const [from, to] = view === 'dia' ? [date, date] : [days[0], days[6]]
   const appts = useAppointments(from, to)
-  const blocks = useBlocks()
+  const blocks = useBlocks(from, to)
   const hours = useWorkingHours()
   const loading = appts.isLoading || blocks.isLoading || hours.isLoading
   const error = appts.isError || blocks.isError || hours.isError
@@ -58,7 +56,7 @@ export default function SchedulePage() {
     <AppLayout
       title="Agenda"
       back={ROUTES.home}
-      menu={<ScheduleMenu onBlock={() => setSheet('block')} onHours={() => setSheet('hours')} />}
+      menu={<ScheduleMenu onBlock={() => setSheet('block')} />}
       primaryAction={{ label: 'Novo agendamento', onClick: () => navigate(`${ROUTES.appointmentNew}?data=${date}`) }}
     >
       <div className="flex flex-col gap-4">
@@ -79,7 +77,6 @@ export default function SchedulePage() {
         ))}
       </div>
       {sheet === 'block' && <BlockTimeSlotSheet open date={date} onClose={() => setSheet(null)} />}
-      {sheet === 'hours' && hours.data && <WorkingHoursSheet open hours={hours.data} onClose={() => setSheet(null)} />}
     </AppLayout>
   )
 }

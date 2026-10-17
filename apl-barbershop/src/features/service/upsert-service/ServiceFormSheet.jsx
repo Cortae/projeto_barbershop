@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { BottomSheet, Button, TextField } from '@/shared/ui'
 import { useAppMutation } from '@/shared/lib/mutation'
-import { parseCurrency, centsToInput } from '@/shared/lib/format'
+import { parseMoney, moneyToInput } from '@/shared/lib/format'
 import { saveService } from '@/entities/service'
 
 export default function ServiceFormSheet({ open, service, onClose }) {
   const [form, setForm] = useState({
     nome: service?.nome ?? '',
-    valor: service ? centsToInput(service.valorCentavos) : '',
+    valor: service ? moneyToInput(service.valor) : '',
     duracao: service ? String(service.duracaoMinutos) : '',
   })
   const [errors, setErrors] = useState({})
@@ -17,14 +17,14 @@ export default function ServiceFormSheet({ open, service, onClose }) {
     setErrors((er) => ({ ...er, [k]: undefined }))
   }
   const submit = () => {
-    const priceCents = parseCurrency(form.valor)
+    const price = parseMoney(form.valor)
     const durationMin = parseInt(form.duracao, 10)
     const errs = {}
     if (!form.nome.trim()) errs.nome = 'Informe o nome.'
-    if (!(priceCents > 0)) errs.valor = 'O preço deve ser maior que zero.'
+    if (!(price > 0)) errs.valor = 'O preço deve ser maior que zero.'
     if (!(durationMin > 0)) errs.duracao = 'Informe a duração em minutos.'
     setErrors(errs)
-    if (!Object.keys(errs).length) mutation.mutate({ id: service?.id, nome: form.nome.trim(), valorCentavos: priceCents, duracaoMinutos: durationMin })
+    if (!Object.keys(errs).length) mutation.mutate({ id: service?.id, nome: form.nome.trim(), valor: price, duracaoMinutos: durationMin })
   }
   const busy = mutation.isPending
   return (

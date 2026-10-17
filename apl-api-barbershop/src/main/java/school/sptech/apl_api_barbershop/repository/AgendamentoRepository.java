@@ -13,27 +13,15 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Intege
 
     Optional<Agendamento> findByPagamentoId(Integer id);
 
-    List<Agendamento> findAllByBarbeiro(Integer id);
+    List<Agendamento> findAllByBarbeiro_IdOrderByHorarioInicioAsc(Integer id);
 
     List<Agendamento> findByHorarioInicioBetweenOrderByHorarioInicioAsc(LocalDateTime inicio, LocalDateTime fim);
 
     @Query("""
     SELECT COUNT(a) > 0
     FROM Agendamento a
-    WHERE a.horarioInicio = :horario
-      AND a.barbeiro.id = :barbeiroId
-      AND a.statusAgendamento.titulo NOT IN ('CANCELADO', 'CONCLUIDO', 'NAO_COMPARECEU')
-""")
-    boolean existeAgendamentoAtivo(
-            @Param("horario") LocalDateTime horario,
-            @Param("barbeiroId") Integer barbeiroId
-    );
-
-    @Query("""
-    SELECT COUNT(a) > 0
-    FROM Agendamento a
     WHERE a.barbeiro.id = :barbeiroId
-      AND a.idAgendamento <> :agendamentoId
+      AND (:agendamentoId IS NULL OR a.idAgendamento <> :agendamentoId)
       AND a.horarioInicio < :fim
       AND a.horarioFim > :inicio
       AND a.statusAgendamento.titulo NOT IN ('CANCELADO', 'CONCLUIDO', 'NAO_COMPARECEU')
@@ -46,7 +34,12 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Intege
     );
 
     List<Agendamento> findByClienteId(Integer id);
-
+           
+    List<Agendamento> findByCliente_IdAndStatusAgendamento_TituloIgnoreCaseOrderByHorarioInicioDesc(
+            Integer id,
+            String status
+    );
+           
     @Query("""
         SELECT a FROM Agendamento a
         JOIN a.pagamento p ON p.pago = false

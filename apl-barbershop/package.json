@@ -12,6 +12,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src",
+    "test": "node --test src/entities/appointment/api/appointmentMapper.test.js",
     "lint:fix": "eslint src --fix",
     "format": "oxfmt src vite.config.ts",
     "format:check": "oxfmt --check src vite.config.ts"

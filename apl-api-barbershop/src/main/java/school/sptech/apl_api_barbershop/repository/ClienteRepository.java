@@ -15,4 +15,10 @@ public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
             String telefone,
             Sort sort
     );
+
+    List<Cliente> findByNomeContainingIgnoreCase(String nome);
+
+    List<Cliente> findByTelefoneContaining(String telefone);
+
+    List<Cliente> findAllByOrderByNomeAsc();
 }
