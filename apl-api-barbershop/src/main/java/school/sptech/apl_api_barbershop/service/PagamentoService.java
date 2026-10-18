@@ -1,10 +1,13 @@
 package school.sptech.apl_api_barbershop.service;
 
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import school.sptech.apl_api_barbershop.dto.pagamento.PagamentoResponse;
 import school.sptech.apl_api_barbershop.dto.pagamento.PagarRequest;
+import school.sptech.apl_api_barbershop.dto.pagamento.PendenteResponse;
 import school.sptech.apl_api_barbershop.entity.Agendamento;
 import school.sptech.apl_api_barbershop.entity.FormaPagamento;
 import school.sptech.apl_api_barbershop.entity.Pagamento;
@@ -14,6 +17,8 @@ import school.sptech.apl_api_barbershop.repository.PagamentoRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -67,6 +72,26 @@ public class PagamentoService {
 
         Pagamento pagamentoSalvo = pagamentoRepository.save(pagamento.get());
         return PagamentoResponse.converter(pagamentoSalvo);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PendenteResponse> listarPendentes() {
+        List<Agendamento> agendamentos = agendamentoRepository.buscarPagamentosPendentes();
+        List<PendenteResponse> pendentes = new ArrayList<>();
+
+        for (Agendamento agendamento : agendamentos) {
+            PendenteResponse pendente = new PendenteResponse(
+                    agendamento.getPagamento().getId(),
+                    agendamento.getCliente().getNome(),
+                    agendamento.getTitulo(),
+                    agendamento.getHorarioInicio().toLocalDate(),
+                    agendamento.getPagamento().getValor()
+            );
+
+            pendentes.add(pendente);
+        }
+
+        return pendentes;
     }
 
 

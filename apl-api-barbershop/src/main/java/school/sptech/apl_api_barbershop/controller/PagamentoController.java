@@ -1,11 +1,13 @@
 package school.sptech.apl_api_barbershop.controller;
 
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import school.sptech.apl_api_barbershop.dto.pagamento.PagamentoResponse;
-import school.sptech.apl_api_barbershop.dto.pagamento.PagarRequest;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import school.sptech.apl_api_barbershop.dto.pagamento.PendenteResponse;
 import school.sptech.apl_api_barbershop.service.PagamentoService;
+
+import java.util.List;
 
 
 @RestController
@@ -16,6 +18,12 @@ public class PagamentoController {
 
     public PagamentoController(PagamentoService pagamentoService) {
         this.pagamentoService = pagamentoService;
+    }
+
+
+    @GetMapping("/pendentes")
+    public ResponseEntity<List<PendenteResponse>> listarPendentes(){
+            return ResponseEntity.ok(pagamentoService.listarPendentes());
     }
 
 
