@@ -1,5 +1,6 @@
 package school.sptech.apl_api_barbershop.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import school.sptech.apl_api_barbershop.entity.Servico;
 
@@ -10,14 +11,21 @@ public class AgendamentoCadastroRequestDto {
 
     @NotNull
     @Min(1)
+    @Schema(description = "Identificado do barbeiro", example = "1")
     private Integer barbeiro;
+
     @NotNull
     @Min(1)
+    @Schema(description = "Identificado do cliente", example = "1")
     private Integer cliente;
+
     @NotNull
     @NotEmpty
+    @Schema(description = "Lista com identificadores dos serviços", example = "[1,2,3]")
     private List<Integer> servicos;
+
     @NotNull
+    @Schema(description = "Dia e horário do inicio do atendimento", example = "2026-10-18T17:57:30")
     private LocalDateTime inicio;
 
     public AgendamentoCadastroRequestDto(Integer barbeiro, Integer cliente, List<Integer> servicos, LocalDateTime inicio) {

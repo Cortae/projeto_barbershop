@@ -1,5 +1,6 @@
 package school.sptech.apl_api_barbershop.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -10,8 +11,11 @@ public class AtualizarServicosAgendamentoRequestDto {
 
     @NotNull
     @Positive
+    @Schema(description = "Identificador do atendimento", example = "1")
     private Integer idAgendamento;
+
     @NotEmpty
+    @Schema(description = "Lista de identificadores dos serviços", example = "[1,2,3]")
     private List<Integer> servicos;
 
     public AtualizarServicosAgendamentoRequestDto(Integer idAgendamento, List<Integer> servicos) {

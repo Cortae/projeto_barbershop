@@ -1,6 +1,7 @@
 
 package school.sptech.apl_api_barbershop.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,8 @@ import school.sptech.apl_api_barbershop.service.ServicoService;
 import java.net.URI;
 import java.util.List;
 
+
+@Tag(name = "Serviços", description = "Operações sobre serviços.")
 @RestController
 @RequestMapping("/servicos")
 public class ServicoController {

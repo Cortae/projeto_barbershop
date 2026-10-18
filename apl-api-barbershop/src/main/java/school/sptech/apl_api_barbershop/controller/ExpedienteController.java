@@ -1,5 +1,6 @@
 package school.sptech.apl_api_barbershop.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -7,6 +8,7 @@ import school.sptech.apl_api_barbershop.dto.expediente.ExpedienteRequest;
 import school.sptech.apl_api_barbershop.dto.expediente.ExpedienteResponse;
 import school.sptech.apl_api_barbershop.service.ExpedienteService;
 
+@Tag(name = "Expedientes", description = "Operações sobre expedientes.")
 @RestController
 @RequestMapping("/usuarios/{usuarioId}/expediente")
 public class ExpedienteController {

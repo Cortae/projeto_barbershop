@@ -1,5 +1,6 @@
 package school.sptech.apl_api_barbershop.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Tag(name = "Bloqueios", description = "Operações sobre bloqueios.")
 @RestController
 @Validated
 @RequestMapping("/bloqueios")

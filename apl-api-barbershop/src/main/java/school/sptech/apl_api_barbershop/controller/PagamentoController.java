@@ -1,5 +1,6 @@
 package school.sptech.apl_api_barbershop.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,7 +10,7 @@ import school.sptech.apl_api_barbershop.service.PagamentoService;
 
 import java.util.List;
 
-
+@Tag(name = "Pagamentos", description = "Operações sobre pagamentos.")
 @RestController
 @RequestMapping("pagamentos/")
 public class PagamentoController {

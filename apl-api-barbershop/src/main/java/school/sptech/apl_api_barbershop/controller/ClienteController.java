@@ -1,6 +1,7 @@
 
 package school.sptech.apl_api_barbershop.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import school.sptech.apl_api_barbershop.dto.ClienteHistoricoResponse;
 
 import jakarta.validation.Valid;
@@ -15,6 +16,8 @@ import school.sptech.apl_api_barbershop.service.ClienteService;
 import java.net.URI;
 import java.util.List;
 
+
+@Tag(name = "Clientes", description = "Operações sobre clientes.")
 @RestController
 @RequestMapping("/clientes")
 public class ClienteController {
