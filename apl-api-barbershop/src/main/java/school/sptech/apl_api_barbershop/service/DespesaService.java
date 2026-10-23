@@ -55,4 +55,32 @@ public class DespesaService {
 
         return new DespesaMesResponse(itens, total);
     }
+
+    public DespesaResponse editar(Integer id, DespesaRequest request) {
+        Optional<Despesa> despesa = despesaRepository.findById(id);
+        if (despesa.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Despesa não encontrada.");
+        }
+
+        Optional<Usuario> usuario = usuarioRepository.findById(request.getUsuarioId());
+        if (usuario.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado.");
+        }
+
+        Despesa despesaEditada = despesa.get();
+        despesaEditada.setUsuario(usuario.get());
+        despesaEditada.setDescricao(request.getDescricao());
+        despesaEditada.setValor(request.getValor());
+        despesaEditada.setDataDespesa(request.getDataDespesa());
+
+        return DespesaMapper.toResponse(despesaRepository.save(despesaEditada));
+    }
+
+    public void excluir(Integer id) {
+        if (!despesaRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Despesa não encontrada.");
+        }
+
+        despesaRepository.deleteById(id);
+    }
 }

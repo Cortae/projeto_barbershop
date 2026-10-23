@@ -32,4 +32,15 @@ public class DespesaController {
     public ResponseEntity<DespesaMesResponse> listarPorMes(@RequestParam YearMonth mes) {
         return ResponseEntity.ok(despesaService.listarPorMes(mes));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DespesaResponse> editar(@PathVariable Integer id, @RequestBody @Valid DespesaRequest request) {
+        return ResponseEntity.ok(despesaService.editar(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Integer id) {
+        despesaService.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
 }
