@@ -1,5 +1,6 @@
 package school.sptech.apl_api_barbershop.dto.despesa;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -9,14 +10,21 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class DespesaRequest {
+    @Schema(description = "Id do usuário que lançou a despesa", example = "1")
     @NotNull
     private Integer usuarioId;
+
+    @Schema(description = "Descrição da despesa", example = "Compra de toalhas", maxLength = 100)
     @Size(max = 100)
     @NotBlank
     private String descricao;
+
+    @Schema(description = "Valor da despesa", example = "85.90")
     @NotNull
     @Positive
     private BigDecimal valor;
+
+    @Schema(description = "Data da despesa", example = "2026-10-15")
     @NotNull
     private LocalDate dataDespesa;
 
