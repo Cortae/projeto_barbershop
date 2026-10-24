@@ -1,55 +1,32 @@
 package school.sptech.apl_api_barbershop.dto.cliente;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
-public class ClienteRequest {
-    @NotBlank
-    @Size(max = 60)
-    private String nome;
+public record ClienteRequest(
 
-    @Size(max = 45)
-    private String apelido;
+        @Schema(description = "Nome completo do cliente", example = "João Silva")
+        @NotBlank
+        @Size(max = 60)
+        String nome,
 
-    @Size(max = 11)
-    private String telefone;
+        @Schema(description = "Apelido do cliente", example = "João")
+        @Size(max = 45)
+        String apelido,
 
-    private LocalDate nascimento;
+        @Schema(description = "Celular do cliente com DDD, apenas números", example = "11987654321")
+        @NotBlank
+        @Pattern(regexp = "\\d{10,11}")
+        String celular,
 
-    public ClienteRequest() {
-    }
+        @Schema(description = "Data de nascimento do cliente", example = "2000-05-15")
+        @Past
+        LocalDate nascimento
 
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getApelido() {
-        return apelido;
-    }
-
-    public void setApelido(String apelido) {
-        this.apelido = apelido;
-    }
-
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-
-    public LocalDate getNascimento() {
-        return nascimento;
-    }
-
-    public void setNascimento(LocalDate nascimento) {
-        this.nascimento = nascimento;
-    }
+) {
 }

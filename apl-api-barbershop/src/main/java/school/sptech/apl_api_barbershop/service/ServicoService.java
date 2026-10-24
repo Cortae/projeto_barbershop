@@ -2,8 +2,8 @@
 package school.sptech.apl_api_barbershop.service;
 
 import org.springframework.stereotype.Service;
-import school.sptech.apl_api_barbershop.dto.ServicoRequest;
-import school.sptech.apl_api_barbershop.dto.ServicoResponse;
+import school.sptech.apl_api_barbershop.dto.servico.ServicoRequest;
+import school.sptech.apl_api_barbershop.dto.servico.ServicoResponse;
 import school.sptech.apl_api_barbershop.entity.Servico;
 import school.sptech.apl_api_barbershop.repository.ServicoRepository;
 
