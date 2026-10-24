@@ -4,7 +4,7 @@ import { useAppMutation } from '@/shared/lib/mutation'
 import { createBlock } from '@/entities/time-slot'
 
 export default function BlockTimeSlotSheet({ open, onClose, date }) {
-  const [form, setForm] = useState({ date, start: '12:00', end: '13:00', reason: '' })
+  const [form, setForm] = useState({ data: date, inicio: '12:00', fim: '13:00', motivo: '' })
   const [error, setError] = useState(null)
   const mutation = useAppMutation({
     mutationFn: createBlock,
@@ -18,8 +18,8 @@ export default function BlockTimeSlotSheet({ open, onClose, date }) {
     setError(null)
   }
   const submit = () => {
-    if (!form.date || !form.start || !form.end) return setError('Informe data, início e fim.')
-    if (form.end <= form.start) return setError('O fim deve ser depois do início.')
+    if (!form.data || !form.inicio || !form.fim) return setError('Informe data, início e fim.')
+    if (form.fim <= form.inicio) return setError('O fim deve ser depois do início.')
     mutation.mutate(form, { onError: (err) => err.code === 'conflict' && setError(err.message) })
   }
   const busy = mutation.isPending
@@ -35,12 +35,12 @@ export default function BlockTimeSlotSheet({ open, onClose, date }) {
         </>
       }
     >
-      <TextField label="Data" type="date" value={form.date} onChange={set('date')} disabled={busy} />
+      <TextField label="Data" type="date" value={form.data} onChange={set('data')} disabled={busy} />
       <div className="grid grid-cols-2 gap-3">
-        <TextField label="Início" type="time" value={form.start} onChange={set('start')} disabled={busy} />
-        <TextField label="Fim" type="time" value={form.end} onChange={set('end')} disabled={busy} />
+        <TextField label="Início" type="time" value={form.inicio} onChange={set('inicio')} disabled={busy} />
+        <TextField label="Fim" type="time" value={form.fim} onChange={set('fim')} disabled={busy} />
       </div>
-      <TextField label="Motivo (opcional)" placeholder="Ex.: almoço, compromisso" value={form.reason} onChange={set('reason')} disabled={busy} />
+      <TextField label="Motivo (opcional)" placeholder="Ex.: almoço, compromisso" value={form.motivo} onChange={set('motivo')} disabled={busy} />
       {error && <Banner>{error}</Banner>}
     </BottomSheet>
   )

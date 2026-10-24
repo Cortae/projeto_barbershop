@@ -11,47 +11,47 @@ export const appointmentKeys = {
 
 const withRefs = (a) => ({
   ...a,
-  client: db.clients.find((c) => c.id === a.clientId),
-  service: db.services.find((s) => s.id === a.serviceId),
+  cliente: db.clientes.find((c) => c.id === a.clienteId),
+  servico: db.servicos.find((s) => s.id === a.servicoId),
 })
 
 /** Intervalo de datas inclusivo (YYYY-MM-DD). */
 export const fetchAppointments = (from, to) =>
   request(() =>
-    db.appointments
-      .filter((a) => a.status !== 'cancelado' && a.startsAt.slice(0, 10) >= from && a.startsAt.slice(0, 10) <= to)
-      .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+    db.agendamentos
+      .filter((a) => a.status !== 'cancelado' && a.horarioInicio.slice(0, 10) >= from && a.horarioInicio.slice(0, 10) <= to)
+      .sort((a, b) => a.horarioInicio.localeCompare(b.horarioInicio))
       .map(withRefs),
   )
-export const fetchAppointment = (id) => request(() => withRefs(db.appointments.find((a) => a.id === id)))
+export const fetchAppointment = (id) => request(() => withRefs(db.agendamentos.find((a) => a.id === id)))
 export const fetchClientAppointments = (clientId) =>
-  request(() => db.appointments.filter((a) => a.clientId === clientId && a.status === 'concluido').sort((a, b) => b.startsAt.localeCompare(a.startsAt)).map(withRefs))
+  request(() => db.agendamentos.filter((a) => a.clienteId === clientId && a.status === 'concluido').sort((a, b) => b.horarioInicio.localeCompare(a.horarioInicio)).map(withRefs))
 
 export const saveAppointment = (data) =>
   request(() => {
-    const service = db.services.find((s) => s.id === data.serviceId)
-    const payload = { ...data, priceCents: service.priceCents, durationMin: service.durationMin }
-    if (findConflict({ ...payload, ignoreId: data.id }, db.appointments, db.blocks))
+    const service = db.servicos.find((s) => s.id === data.servicoId)
+    const payload = { ...data, valorCentavos: service.valorCentavos, duracaoMinutos: service.duracaoMinutos }
+    if (findConflict({ ...payload, ignorarId: data.id }, db.agendamentos, db.bloqueios))
       throw new ApiError('conflict', 'Esse horário já está ocupado. Escolha outro horário livre.')
     if (data.id) {
-      Object.assign(db.appointments.find((a) => a.id === data.id), payload)
+      Object.assign(db.agendamentos.find((a) => a.id === data.id), payload)
       return withRefs(payload)
     }
     const a = { ...payload, id: nextId('a'), status: 'agendado' }
-    db.appointments.push(a)
+    db.agendamentos.push(a)
     return withRefs(a)
   })
 
 const patch = (id, changes) =>
   request(() => {
-    const a = db.appointments.find((x) => x.id === id)
+    const a = db.agendamentos.find((x) => x.id === id)
     Object.assign(a, changes)
     return withRefs(a)
   })
 export const cancelAppointment = (id) => patch(id, { status: 'cancelado' })
-export const completeAppointment = (id, { paymentStatus, paymentMethod }) =>
-  patch(id, { status: 'concluido', paymentStatus, paymentMethod: paymentStatus === 'pago' ? paymentMethod : undefined })
-export const markAppointmentPaid = (id) => patch(id, { paymentStatus: 'pago' })
+export const completeAppointment = (id, { statusPagamento, formaPagamento }) =>
+  patch(id, { status: 'concluido', statusPagamento, formaPagamento: statusPagamento === 'pago' ? formaPagamento : undefined })
+export const markAppointmentPaid = (id) => patch(id, { statusPagamento: 'pago' })
 
 export const useAppointments = (from, to) => useQuery({ queryKey: appointmentKeys.range(from, to), queryFn: () => fetchAppointments(from, to) })
 export const useAppointment = (id) => useQuery({ queryKey: appointmentKeys.detail(id), queryFn: () => fetchAppointment(id), enabled: !!id })

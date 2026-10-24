@@ -8,7 +8,7 @@ import { MarkAsPaidButton } from '@/features/appointment/mark-as-paid'
 
 export default function PendingPaymentsList({ items }) {
   const navigate = useNavigate()
-  const total = items.reduce((s, a) => s + a.priceCents, 0)
+  const total = items.reduce((s, a) => s + a.valorCentavos, 0)
   return (
     <section aria-labelledby="pendentes" className="flex flex-col gap-3">
       <div>
@@ -33,12 +33,12 @@ export default function PendingPaymentsList({ items }) {
                 className="flex cursor-pointer flex-col gap-2 rounded-12 border border-borda bg-superficie p-4 hover:bg-superficie-elevada"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <span className="font-medium">{a.client.name} · {a.service.name}</span>
+                  <span className="font-medium">{a.cliente.nome} · {a.servico.nome}</span>
                   <PaymentBadge status="pendente" />
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <span className="texto-corpo-pequeno tabular-nums text-texto-secundario">
-                    {formatDayMonth(a.startsAt)} · <span className="texto-valor text-alerta">{formatCurrency(a.priceCents)}</span>
+                    {formatDayMonth(a.horarioInicio)} · <span className="texto-valor text-alerta">{formatCurrency(a.valorCentavos)}</span>
                   </span>
                   <MarkAsPaidButton appointment={a} />
                 </div>

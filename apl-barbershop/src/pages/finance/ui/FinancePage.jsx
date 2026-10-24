@@ -24,10 +24,10 @@ export default function FinancePage() {
           <>
             <FinanceKpis summary={data} />
             <div className="grid gap-6 lg:grid-cols-2">
-              <ProfitChart weeks={data.weeks} />
-              <RevenueByService items={data.byService} />
+              <ProfitChart weeks={data.semanas} />
+              <RevenueByService items={data.porServico} />
             </div>
-            <PendingPaymentsList items={data.pending} />
+            <PendingPaymentsList items={data.pendentes} />
           </>
         )}
       </div>

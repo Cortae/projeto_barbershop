@@ -48,11 +48,11 @@ export default function ClientsPage() {
                 {list.map((c) => (
                   <tr key={c.id} onClick={() => open(c.id)} className="cursor-pointer hover:bg-superficie-elevada">
                     <td className="px-4 py-3">
-                      <button className="font-medium hover:underline" onClick={() => open(c.id)}>{c.name}</button>
+                      <button className="font-medium hover:underline" onClick={() => open(c.id)}>{c.nome}</button>
                     </td>
-                    <td className="px-4 py-3 tabular-nums text-texto-secundario">{c.phone}</td>
-                    <td className="px-4 py-3 tabular-nums text-texto-secundario">{c.lastVisitAt ? formatDate(c.lastVisitAt) : '—'}</td>
-                    <td className="px-4 py-3">{c.pendingCents > 0 ? <PaymentBadge status="pendente" amountCents={c.pendingCents} /> : <span className="text-texto-secundario">—</span>}</td>
+                    <td className="px-4 py-3 tabular-nums text-texto-secundario">{c.telefone}</td>
+                    <td className="px-4 py-3 tabular-nums text-texto-secundario">{c.ultimaVisitaEm ? formatDate(c.ultimaVisitaEm) : '—'}</td>
+                    <td className="px-4 py-3">{c.valorPendenteCentavos > 0 ? <PaymentBadge status="pendente" valorCentavos={c.valorPendenteCentavos} /> : <span className="text-texto-secundario">—</span>}</td>
                     <td className="pr-4"><ChevronRight className="size-5 text-texto-secundario" aria-hidden /></td>
                   </tr>
                 ))}

@@ -10,10 +10,10 @@ export default function NextAppointment({ appointment }) {
     <Card highlight className="flex flex-col gap-2">
       <span className="texto-label text-primaria">Próximo corte</span>
       <p className="texto-h2 tabular-nums">
-        {formatTime(appointment.startsAt)} · {appointment.client.name}
+        {formatTime(appointment.horarioInicio)} · {appointment.cliente.nome}
       </p>
       <p className="text-texto-secundario tabular-nums">
-        {appointment.service.name} · {formatCurrency(appointment.priceCents)}
+        {appointment.servico.nome} · {formatCurrency(appointment.valorCentavos)}
       </p>
       <Button variant="secondary" size="sm" className="mt-2 self-start" onClick={() => navigate(ROUTES.appointment(appointment.id))}>
         Ver detalhes

@@ -5,8 +5,8 @@ import { ROUTES } from '@/shared/config'
 
 export default function DaySummary({ appointments }) {
   const navigate = useNavigate()
-  const received = appointments.filter((a) => a.paymentStatus === 'pago').reduce((s, a) => s + a.priceCents, 0)
-  const toReceive = appointments.filter((a) => a.status === 'agendado' || a.paymentStatus === 'pendente').reduce((s, a) => s + a.priceCents, 0)
+  const received = appointments.filter((a) => a.statusPagamento === 'pago').reduce((s, a) => s + a.valorCentavos, 0)
+  const toReceive = appointments.filter((a) => a.status === 'agendado' || a.statusPagamento === 'pendente').reduce((s, a) => s + a.valorCentavos, 0)
   return (
     <Card onClick={() => navigate(ROUTES.finance)} chevron aria-label={`Hoje: recebido ${formatCurrency(received)}, a receber ${formatCurrency(toReceive)}. Abrir financeiro`}>
       <h2 className="texto-h3">Hoje</h2>

@@ -24,10 +24,10 @@ export default function FinanceKpis({ summary }) {
   const navigate = useNavigate()
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-6">
-      <Kpi label="Lucro bruto" value={summary.grossCents} />
-      <Kpi label="Despesas" value={summary.expensesCents} onClick={() => navigate(ROUTES.expenses)} />
-      <Kpi label="Lucro líquido" value={summary.netCents} tone="text-primaria" highlight />
-      <Kpi label="A receber" value={summary.receivableCents} tone="text-alerta" />
+      <Kpi label="Lucro bruto" value={summary.valorBrutoCentavos} />
+      <Kpi label="Despesas" value={summary.despesasCentavos} onClick={() => navigate(ROUTES.expenses)} />
+      <Kpi label="Lucro líquido" value={summary.valorLiquidoCentavos} tone="text-primaria" highlight />
+      <Kpi label="A receber" value={summary.valorAReceberCentavos} tone="text-alerta" />
     </div>
   )
 }

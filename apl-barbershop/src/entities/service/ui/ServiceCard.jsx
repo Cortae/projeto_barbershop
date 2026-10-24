@@ -5,9 +5,9 @@ export default function ServiceCard({ service, action }) {
   return (
     <Card className="flex items-center gap-3">
       <div className="min-w-0 flex-1">
-        <h3 className="texto-h3">{service.name}</h3>
+        <h3 className="texto-h3">{service.nome}</h3>
         <p className="texto-corpo-pequeno mt-1 text-texto-secundario tabular-nums">
-          {service.durationMin} min · {formatCurrency(service.priceCents)}
+          {service.duracaoMinutos} min · {formatCurrency(service.valorCentavos)}
         </p>
       </div>
       {action}

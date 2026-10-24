@@ -42,7 +42,7 @@ function ScheduleMenu({ onBlock, onHours }) {
 
 export default function SchedulePage() {
   const navigate = useNavigate()
-  const { view, date, setView, setDate, goToDay } = useScheduleParams()
+  const { vista: view, data: date, definirVista: setView, definirData: setDate, irParaDia: goToDay } = useScheduleParams()
   const [sheet, setSheet] = useState(null)
   const days = weekDays(date)
   const [from, to] = view === 'dia' ? [date, date] : [days[0], days[6]]

@@ -4,8 +4,8 @@ import { formatCurrency, formatDate } from '@/shared/lib/format'
 import { useClientAppointments } from '@/entities/appointment'
 import { PaymentBadge } from '@/entities/payment'
 
-export default function ClientHistory({ clientId }) {
-  const { data, isLoading, isError, refetch } = useClientAppointments(clientId)
+export default function ClientHistory({ clienteId }) {
+  const { data, isLoading, isError, refetch } = useClientAppointments(clienteId)
   return (
     <section aria-labelledby="historico" className="flex flex-col gap-3">
       <h2 id="historico" className="texto-h2">Histórico de atendimentos</h2>
@@ -16,10 +16,10 @@ export default function ClientHistory({ clientId }) {
         <ul className="divide-y divide-borda overflow-hidden rounded-12 border border-borda bg-superficie">
           {data.map((a) => (
             <li key={a.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 p-4">
-              <span className="texto-corpo-pequeno tabular-nums text-texto-secundario">{formatDate(a.startsAt)}</span>
-              <span className="flex-1">{a.service.name}</span>
-              <span className="texto-valor">{formatCurrency(a.priceCents)}</span>
-              <PaymentBadge status={a.paymentStatus} />
+              <span className="texto-corpo-pequeno tabular-nums text-texto-secundario">{formatDate(a.horarioInicio)}</span>
+              <span className="flex-1">{a.servico.nome}</span>
+              <span className="texto-valor">{formatCurrency(a.valorCentavos)}</span>
+              <PaymentBadge status={a.statusPagamento} />
             </li>
           ))}
         </ul>
