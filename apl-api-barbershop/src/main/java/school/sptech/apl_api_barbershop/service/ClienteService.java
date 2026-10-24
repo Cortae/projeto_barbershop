@@ -1,12 +1,12 @@
 package school.sptech.apl_api_barbershop.service;
 
-import school.sptech.apl_api_barbershop.dto.ClienteHistoricoResponse;
+import school.sptech.apl_api_barbershop.dto.cliente.ClienteHistoricoResponse;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import school.sptech.apl_api_barbershop.dto.ClienteItemResponse;
-import school.sptech.apl_api_barbershop.dto.ClienteRequest;
-import school.sptech.apl_api_barbershop.dto.ClienteResponse;
+import school.sptech.apl_api_barbershop.dto.cliente.ClienteItemResponse;
+import school.sptech.apl_api_barbershop.dto.cliente.ClienteRequest;
+import school.sptech.apl_api_barbershop.dto.cliente.ClienteResponse;
 import school.sptech.apl_api_barbershop.entity.Cliente;
 import school.sptech.apl_api_barbershop.repository.ClienteRepository;
 
@@ -21,7 +21,7 @@ import school.sptech.apl_api_barbershop.entity.Pagamento;
 import java.util.List;
 import java.util.Optional;
 
-import school.sptech.apl_api_barbershop.dto.ClienteHistoricoServicoResponse;
+import school.sptech.apl_api_barbershop.dto.cliente.ClienteHistoricoServicoResponse;
 import school.sptech.apl_api_barbershop.entity.AgendamentoServico;
 import school.sptech.apl_api_barbershop.repository.AgendamentoServicoRepository;
 

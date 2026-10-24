@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.sptech.apl_api_barbershop.dto.AgendamentoCadastroRequestDto;
-import school.sptech.apl_api_barbershop.dto.AtualizarServicosAgendamentoRequestDto;
+import school.sptech.apl_api_barbershop.dto.servico.AtualizarServicosAgendamentoRequestDto;
 import school.sptech.apl_api_barbershop.dto.RemarcarAgendamentoRequestDto;
 import school.sptech.apl_api_barbershop.dto.agendamento.AgendamentoResponse;
 import school.sptech.apl_api_barbershop.dto.agendamento.EditarAgendamentoRequest;

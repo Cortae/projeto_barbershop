@@ -1,14 +1,21 @@
 package school.sptech.apl_api_barbershop.dto.expediente;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 
 public class DiaExpedienteResponse {
 
+    @Schema(description = "Dia da semana: 1=segunda-feira, ..., 7=domingo", example = "1")
     private Integer diaSemana;
+    @Schema(description = "Indica se o estabelecimento atende neste dia", example = "true")
     private boolean aberto;
+    @Schema(description = "Horário de abertura", example = "09:00:00")
     private LocalTime horaAbertura;
+    @Schema(description = "Horário de fechamento", example = "18:00:00")
     private LocalTime horaFechamento;
+    @Schema(description = "Início do intervalo", example = "12:00:00")
     private LocalTime intervaloInicio;
+    @Schema(description = "Fim do intervalo", example = "13:00:00")
     private LocalTime intervaloFim;
 
     public DiaExpedienteResponse() {

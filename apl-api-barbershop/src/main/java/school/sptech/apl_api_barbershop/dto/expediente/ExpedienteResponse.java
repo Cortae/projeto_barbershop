@@ -1,10 +1,13 @@
 package school.sptech.apl_api_barbershop.dto.expediente;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 public class ExpedienteResponse {
 
+    @Schema(description = "Identificador do usuário/barbeiro", example = "1")
     private Integer usuarioId;
+    @Schema(description = "Expediente configurado para cada dia da semana")
     private List<DiaExpedienteResponse> dias;
 
     public ExpedienteResponse() {

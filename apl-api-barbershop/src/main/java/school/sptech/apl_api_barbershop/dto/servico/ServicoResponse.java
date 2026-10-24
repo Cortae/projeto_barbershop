@@ -1,36 +1,25 @@
+
 package school.sptech.apl_api_barbershop.dto.servico;
 
-import school.sptech.apl_api_barbershop.entity.Servico;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 
-public class ServicoResponse {
-    private Integer id;
-    private String titulo;
-    private BigDecimal valor;
-    private Integer duracao;
+public record ServicoResponse(
 
-    public ServicoResponse() {
-    }
+        @Schema(description = "Identificador do serviço", example = "1")
+        Integer id,
 
-    public ServicoResponse(Integer id, String titulo, BigDecimal valor, Integer duracao) {
-        this.id = id;
-        this.titulo = titulo;
-        this.valor = valor;
-        this.duracao = duracao;
-    }
+        @Schema(description = "Título do serviço", example = "Corte masculino")
+        String titulo,
 
-    public static ServicoResponse from(Servico servico) {
-        return new ServicoResponse(servico.getId(), servico.getTitulo(),
-                servico.getValorAtual(), servico.getDuracaoAtual());
-    }
+        @Schema(description = "Valor atual do serviço em reais", example = "35.00")
+        BigDecimal valorAtual,
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
-    public BigDecimal getValor() { return valor; }
-    public void setValor(BigDecimal valor) { this.valor = valor; }
-    public Integer getDuracao() { return duracao; }
-    public void setDuracao(Integer duracao) { this.duracao = duracao; }
+        @Schema(description = "Duração do serviço em minutos", example = "30")
+        Integer duracaoAtual,
+
+        @Schema(description = "Indica se o serviço está ativo", example = "true")
+        boolean ativo
+
+) {
 }
