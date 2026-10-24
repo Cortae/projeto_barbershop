@@ -1,10 +1,24 @@
 package school.sptech.apl_api_barbershop.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Dados retornados de um usuário")
 public class UsuarioResponse {
 
+    @Schema(description = "Identificador do usuário",
+            example = "1")
     private Integer id;
+
+    @Schema(description = "Nome do usuário",
+            example = "João da Silva")
     private String nome;
+
+    @Schema(description = "E-mail do usuário",
+            example = "joao@email.com")
     private String email;
+
+    @Schema(description = "Tipo de usuário",
+            example = "ADMINISTRADOR")
     private String tipoUsuario;
 
     public UsuarioResponse() {}

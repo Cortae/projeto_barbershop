@@ -1,5 +1,6 @@
 package school.sptech.apl_api_barbershop.dto.expediente;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -11,14 +12,20 @@ public class DiaExpedienteRequest {
     @NotNull
     @Min(1)
     @Max(7)
+    @Schema(description = "Dia da semana: 1=segunda-feira, ..., 7=domingo", example = "1", minimum = "1", maximum = "7")
     private Integer diaSemana;
 
     @NotNull
+    @Schema(description = "Indica se o estabelecimento atende neste dia", example = "true")
     private Boolean aberto;
 
+    @Schema(description = "Horário de abertura (obrigatório quando aberto)", example = "09:00:00")
     private LocalTime horaAbertura;
+    @Schema(description = "Horário de fechamento (obrigatório quando aberto)", example = "18:00:00")
     private LocalTime horaFechamento;
+    @Schema(description = "Início do intervalo; deve ser informado junto com o fim", example = "12:00:00")
     private LocalTime intervaloInicio;
+    @Schema(description = "Fim do intervalo; deve ser informado junto com o início", example = "13:00:00")
     private LocalTime intervaloFim;
 
     public DiaExpedienteRequest() {
