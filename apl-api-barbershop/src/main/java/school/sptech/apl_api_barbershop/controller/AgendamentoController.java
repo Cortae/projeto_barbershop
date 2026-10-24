@@ -3,6 +3,7 @@ package school.sptech.apl_api_barbershop.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,7 +42,7 @@ public class AgendamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Barbeiro encontrado"),
-            @ApiResponse(responseCode = "404", description = "Barbeiro não encontrado")
+            @ApiResponse(responseCode = "404", description = "Barbeiro não encontrado", content = @Content)
     })
     @GetMapping("/barbeiro/{id}")
     public ResponseEntity<List<AgendamentoResponse>> buscarPorBarbeiro(
@@ -60,7 +61,7 @@ public class AgendamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Cancelamento efetuado"),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado")
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado", content = @Content)
     })
     @PatchMapping("/cancelar/{id}")
     public ResponseEntity<AgendamentoResponse> cancelarAgendamento(
@@ -75,8 +76,8 @@ public class AgendamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Status atualizado"),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
-            @ApiResponse(responseCode="400", description = "Status não permitido")
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado", content = @Content),
+            @ApiResponse(responseCode="400", description = "Status não permitido", content = @Content)
     })
     @PatchMapping("/atualizar-status/{id}")
     public ResponseEntity<AgendamentoResponse> confirmarAgendamento(
@@ -93,8 +94,8 @@ public class AgendamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Status atualizado para concluído"),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
-            @ApiResponse(responseCode="400", description = "Conflito no horário do agendamento")
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado", content = @Content),
+            @ApiResponse(responseCode="400", description = "Conflito no horário do agendamento", content = @Content)
     })
     @PatchMapping("/concluir/{id}")
     public ResponseEntity<AgendamentoResponse> concluirAgendamento(
@@ -111,9 +112,9 @@ public class AgendamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Agendamento atualizado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
-            @ApiResponse(responseCode="400", description = "Formato inválido para agendamento"),
-            @ApiResponse(responseCode="400", description = "Conflito no horário de agendamento")
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado", content = @Content),
+            @ApiResponse(responseCode="400", description = "Formato inválido para agendamento", content = @Content),
+            @ApiResponse(responseCode="409", description = "Conflito no horário de agendamento", content = @Content)
     })
     @PutMapping("/{id}")
     public ResponseEntity<AgendamentoResponse> editar(
@@ -129,8 +130,8 @@ public class AgendamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Serviços vinculados ao agendamento atualizados com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
-            @ApiResponse(responseCode="400", description = "Formado inválido para agendamento")
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado", content = @Content),
+            @ApiResponse(responseCode="400", description = "Formado inválido para agendamento", content = @Content)
     })
     @PatchMapping("/servicos")
     public ResponseEntity<AgendamentoResponse> atualizarServicosAgendamento(@RequestBody @Valid AtualizarServicosAgendamentoRequestDto request){
@@ -144,8 +145,8 @@ public class AgendamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Agendamento remarcado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
-            @ApiResponse(responseCode="409", description = "Conflito no horário do agendamento")
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado", content = @Content),
+            @ApiResponse(responseCode="409", description = "Conflito no horário do agendamento", content = @Content)
     })
     @PatchMapping("/horario")
     public ResponseEntity<AgendamentoResponse> remarcarAgendamento(@RequestBody @Valid RemarcarAgendamentoRequestDto request){
@@ -159,7 +160,7 @@ public class AgendamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Agendamentos listados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Periodo informado inválido")
+            @ApiResponse(responseCode = "400", description = "Periodo informado inválido", content = @Content)
     })
     @GetMapping({"/periodo", "/periodo/"})
     public ResponseEntity<List<AgendamentoResponse>> listarPorPeriodo(
@@ -179,7 +180,7 @@ public class AgendamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Agendamento buscado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado")
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado", content = @Content)
     })
     @GetMapping("/{id}")
     public ResponseEntity<AgendamentoResponse> buscarPorId(
@@ -200,7 +201,7 @@ public class AgendamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Agendamento listados com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content)
     })
     @GetMapping("/cliente/{id}")
     public ResponseEntity<List<AgendamentoResponse>> buscarAgendamentosPorCliente(
@@ -220,8 +221,8 @@ public class AgendamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Agendamento cadastrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Agendamento com formato inválido"),
-            @ApiResponse(responseCode="409", description = "Conflito no horário do agendamento")
+            @ApiResponse(responseCode = "400", description = "Agendamento com formato inválido", content = @Content),
+            @ApiResponse(responseCode="409", description = "Conflito no horário do agendamento", content = @Content)
     })
     @PostMapping
     public ResponseEntity<AgendamentoResponse> cadastrar(@RequestBody @Valid AgendamentoCadastroRequestDto agendamento){
@@ -234,8 +235,8 @@ public class AgendamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Agendamento marcado como pago com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
-            @ApiResponse(responseCode="400", description = "O agendamento precisa estar concluido para ser pago")
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado", content = @Content),
+            @ApiResponse(responseCode="400", description = "O agendamento precisa estar concluido para ser pago", content = @Content)
     })
     @PatchMapping("/pagar")
     public ResponseEntity<AgendamentoResponse> marcarComoPago(@RequestBody @Valid PagarRequest request){
