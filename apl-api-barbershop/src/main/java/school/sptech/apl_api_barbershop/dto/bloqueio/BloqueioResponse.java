@@ -1,12 +1,18 @@
 package school.sptech.apl_api_barbershop.dto.bloqueio;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 
 public class BloqueioResponse {
+    @Schema(description = "Identificador do bloqueio", example = "1")
     private Integer id;
+    @Schema(description = "Identificador do usuário/barbeiro do bloqueio", example = "1")
     private Integer usuarioId;
+    @Schema(description = "Data e hora de início do bloqueio", example = "2026-10-23T09:00:00")
     private LocalDateTime inicio;
+    @Schema(description = "Data e hora de término do bloqueio", example = "2026-10-23T12:00:00")
     private LocalDateTime fim;
+    @Schema(description = "Motivo do bloqueio", example = "Compromisso pessoal")
     private String motivo;
 
     public BloqueioResponse() {
