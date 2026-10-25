@@ -178,10 +178,10 @@ INSERT INTO tipo_usuario (id_tipo_usuario, titulo) VALUES
 
 INSERT INTO usuario
 (id_usuario, nome, email, celular, fk_tipo_usuario, senha, google_sub) VALUES
-                                                                           (default, 'Administrador Teste', 'admin@barbershop.test', '11990000001', 1, '$2a$10$hashFicticioNaoUtilizarEmProducao', NULL),
-                                                                           (default, 'Lucas Almeida', 'lucas@barbershop.test', '11990000002', 2, '$2a$10$hashFicticioNaoUtilizarEmProducao', NULL),
-                                                                           (default, 'Rafael Santos', 'rafael@barbershop.test', '11990000003', 2, '$2a$10$hashFicticioNaoUtilizarEmProducao', NULL),
-                                                                           (default, 'Marina Costa', 'marina@barbershop.test', '11990000004', 3, '$2a$10$hashFicticioNaoUtilizarEmProducao', 'google-sub-teste-004');
+                                                                           (default, 'Administrador Teste', 'admin@barbershop.test', '11990000001', 1, 'senha123', NULL),
+                                                                           (default, 'Lucas Almeida', 'lucas@barbershop.test', '11990000002', 2, 'senha123', NULL),
+                                                                           (default, 'Rafael Santos', 'rafael@barbershop.test', '11990000003', 2, 'senha123', NULL),
+                                                                           (default, 'Marina Costa', 'marina@barbershop.test', '11990000004', 3, 'senha123', 'google-sub-teste-004');
 
 INSERT INTO status_agendamento (id_status_agendamento, titulo) VALUES
                                                                    (default, 'AGENDADO'),
