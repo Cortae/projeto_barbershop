@@ -19,7 +19,7 @@ export function createAuditRepository(pool) {
           http_method, endpoint, query_params, request_headers, request_body,
           request_body_bytes, request_body_truncated, response_status,
           response_headers, response_body, response_body_bytes,
-          response_body_truncated, source_ip, user_agent, user_id, error_code
+          response_body_truncated, source_ip, user_agent, fk_usuario, error_code
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           log.requestId, log.startedAt, log.finishedAt, log.durationMs, log.eventType,
@@ -32,7 +32,7 @@ export function createAuditRepository(pool) {
       )
     },
     async ping() {
-      await pool.query('SELECT 1')
+      await pool.query('SELECT 1 FROM api_request_log LIMIT 1')
     },
   }
 }

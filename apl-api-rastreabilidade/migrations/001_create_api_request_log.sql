@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS api_request_log (
-  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  id_api_request_log BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   request_id CHAR(36) NOT NULL,
   started_at DATETIME(3) NOT NULL,
   finished_at DATETIME(3) NOT NULL,
@@ -19,12 +19,16 @@ CREATE TABLE IF NOT EXISTS api_request_log (
   response_body_truncated BOOLEAN NOT NULL DEFAULT FALSE,
   source_ip VARCHAR(45) NULL,
   user_agent VARCHAR(500) NULL,
-  user_id BIGINT NULL,
+  fk_usuario INT NULL,
   error_code VARCHAR(50) NULL,
-  PRIMARY KEY (id),
+  PRIMARY KEY (id_api_request_log),
   UNIQUE KEY uq_api_request_log_request_id (request_id),
   KEY idx_api_request_log_started_at (started_at),
   KEY idx_api_request_log_status (response_status),
   KEY idx_api_request_log_event_type (event_type),
-  KEY idx_api_request_log_user_id_started_at (user_id, started_at)
+  KEY idx_api_request_log_usuario_started_at (fk_usuario, started_at),
+  CONSTRAINT fk_api_request_log_usuario
+    FOREIGN KEY (fk_usuario) REFERENCES usuario (id_usuario)
+    ON DELETE SET NULL
+    ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

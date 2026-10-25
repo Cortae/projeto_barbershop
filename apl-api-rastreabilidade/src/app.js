@@ -17,8 +17,8 @@ export function createApp({ config, auditRepository }) {
     }
   })
 
-  app.use('/api', express.raw({ type: '*/*', limit: config.requestBodyLimit }))
-  app.use('/api', createProxyRouter())
+  app.use(express.raw({ type: '*/*', limit: config.requestBodyLimit }))
+  app.use(createProxyRouter({ config, auditRepository }))
 
   app.use((error, _req, res, _next) => {
     if (error?.type === 'entity.too.large') {

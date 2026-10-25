@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router'
 import { useSession } from '@/entities/barber'
-import { GoogleSignInButton } from '@/features/auth/sign-in-google'
+import { CredentialsSignInForm } from '@/features/auth/sign-in-credentials'
 import { Logo } from '@/widgets/app-layout'
 import { ROUTES } from '@/shared/config'
 
@@ -23,8 +23,8 @@ export default function LoginPage() {
           </div>
         </div>
         <div className="relative mt-12">
-          <GoogleSignInButton />
-          <p className="texto-corpo-pequeno mt-4 text-center text-texto-secundario">Acesso restrito ao barbeiro.</p>
+          <CredentialsSignInForm />
+          <p className="texto-corpo-pequeno mt-4 text-center text-texto-secundario">Acesso restrito a administradores.</p>
         </div>
       </div>
     </main>

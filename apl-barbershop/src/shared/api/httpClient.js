@@ -1,6 +1,11 @@
 import { ApiError } from './apiError'
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
+const useTraceApi = import.meta.env.VITE_USE_TRACE_API === 'true'
+const API_BASE_URL = (
+  useTraceApi
+    ? import.meta.env.VITE_TRACE_API_URL || '/trace-api'
+    : import.meta.env.VITE_BACKEND_API_URL || '/backend-api'
+).replace(/\/$/, '')
 
 export async function apiRequest(path, options = {}) {
   const controller = new AbortController()

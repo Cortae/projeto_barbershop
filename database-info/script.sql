@@ -183,22 +183,41 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `db_barbershop`.`log_sistema`
+-- Table `db_barbershop`.`api_request_log`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `db_barbershop`.`log_sistema` (
-  `id_log_sistema` INT NOT NULL AUTO_INCREMENT,
-  `data_hora` DATETIME NOT NULL,
-  `tipo_evento` VARCHAR(50) NOT NULL,
-  `endpoint` VARCHAR(150) NOT NULL,
-  `mensagem` VARCHAR(200) NOT NULL,
-  `metodo_http` VARCHAR(10) NOT NULL,
-  `fk_usuario` INT NOT NULL,
-  PRIMARY KEY (`id_log_sistema`),
-  INDEX `fk_log_sistema_usuario1_idx` (`fk_usuario` ASC) VISIBLE,
-  CONSTRAINT `fk_log_sistema_usuario1`
+CREATE TABLE IF NOT EXISTS `db_barbershop`.`api_request_log` (
+  `id_api_request_log` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `request_id` CHAR(36) NOT NULL,
+  `started_at` DATETIME(3) NOT NULL,
+  `finished_at` DATETIME(3) NOT NULL,
+  `duration_ms` INT UNSIGNED NOT NULL,
+  `event_type` VARCHAR(30) NOT NULL,
+  `http_method` VARCHAR(10) NOT NULL,
+  `endpoint` VARCHAR(500) NOT NULL,
+  `query_params` JSON NULL,
+  `request_headers` JSON NULL,
+  `request_body` JSON NULL,
+  `request_body_bytes` INT UNSIGNED NOT NULL DEFAULT 0,
+  `request_body_truncated` TINYINT(1) NOT NULL DEFAULT 0,
+  `response_status` SMALLINT UNSIGNED NOT NULL,
+  `response_headers` JSON NULL,
+  `response_body` JSON NULL,
+  `response_body_bytes` INT UNSIGNED NOT NULL DEFAULT 0,
+  `response_body_truncated` TINYINT(1) NOT NULL DEFAULT 0,
+  `source_ip` VARCHAR(45) NULL,
+  `user_agent` VARCHAR(500) NULL,
+  `fk_usuario` INT NULL,
+  `error_code` VARCHAR(50) NULL,
+  PRIMARY KEY (`id_api_request_log`),
+  UNIQUE INDEX `uq_api_request_log_request_id` (`request_id` ASC) VISIBLE,
+  INDEX `idx_api_request_log_started_at` (`started_at` ASC) VISIBLE,
+  INDEX `idx_api_request_log_status` (`response_status` ASC) VISIBLE,
+  INDEX `idx_api_request_log_event_type` (`event_type` ASC) VISIBLE,
+  INDEX `idx_api_request_log_usuario_started_at` (`fk_usuario` ASC, `started_at` ASC) VISIBLE,
+  CONSTRAINT `fk_api_request_log_usuario`
     FOREIGN KEY (`fk_usuario`)
     REFERENCES `db_barbershop`.`usuario` (`id_usuario`)
-    ON DELETE NO ACTION
+    ON DELETE SET NULL
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
