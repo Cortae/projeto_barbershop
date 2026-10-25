@@ -1,8 +1,7 @@
-package school.sptech.apl_api_barbershop.dto;
+package school.sptech.apl_api_barbershop.dto.agendamento;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import school.sptech.apl_api_barbershop.entity.Servico;
 
 import java.time.LocalDateTime;
 import java.util.List;

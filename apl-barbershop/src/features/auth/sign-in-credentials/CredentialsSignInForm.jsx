@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { signIn, setSession } from '@/entities/barber'
 import { ROUTES } from '@/shared/config'
 import { Banner, Button, TextField } from '@/shared/ui'
@@ -61,6 +61,12 @@ export default function CredentialsSignInForm() {
         error={errors.senha}
         disabled={loading}
       />
+      <p className="texto-corpo-pequeno -mt-2 text-right text-texto-secundario">
+        Esqueceu sua senha?{' '}
+        <Link className="font-medium text-primaria hover:underline" to={ROUTES.recoverPassword}>
+          Recupere seu acesso
+        </Link>
+      </p>
       <Button type="submit" size="lg" full loading={loading} loadingLabel="Entrando...">
         Entrar
       </Button>

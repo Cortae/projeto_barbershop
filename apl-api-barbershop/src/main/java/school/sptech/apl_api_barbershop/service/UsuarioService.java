@@ -1,5 +1,8 @@
 package school.sptech.apl_api_barbershop.service;
 
+import jakarta.transaction.Transactional;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -11,17 +14,29 @@ import school.sptech.apl_api_barbershop.entity.Usuario;
 import school.sptech.apl_api_barbershop.repository.TipoUsuarioRepository;
 import school.sptech.apl_api_barbershop.repository.UsuarioRepository;
 
+import java.security.SecureRandom;
+
 @Service
 public class UsuarioService {
+
+    private static final int TAMANHO_SENHA_TEMPORARIA = 12;
+    private static final String CARACTERES_SENHA =
+            "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$%";
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private final UsuarioRepository usuarioRepository;
     private final TipoUsuarioRepository tipoUsuarioRepository;
     private final ExpedienteService expedienteService;
+    private final JavaMailSender mailSender;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, TipoUsuarioRepository tipoUsuarioRepository, ExpedienteService expedienteService) {
+    public UsuarioService(UsuarioRepository usuarioRepository,
+                          TipoUsuarioRepository tipoUsuarioRepository,
+                          ExpedienteService expedienteService,
+                          JavaMailSender mailSender) {
         this.usuarioRepository = usuarioRepository;
         this.tipoUsuarioRepository = tipoUsuarioRepository;
         this.expedienteService = expedienteService;
+        this.mailSender = mailSender;
     }
 
     public UsuarioResponse cadastrar(UsuarioRequest request) {
@@ -120,6 +135,43 @@ public class UsuarioService {
         );
     }
 
+    @Transactional
+    public void enviarNovaSenha(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email);
+
+        if (usuario == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "E-mail não cadastrado"
+            );
+        }
+
+        String novaSenha = gerarSenhaAleatoria();
+        usuario.setSenha(novaSenha);
+        usuarioRepository.save(usuario);
+
+        SimpleMailMessage mensagem = new SimpleMailMessage();
+        mensagem.setTo(usuario.getEmail());
+        mensagem.setSubject("Recuperação de senha - JR Barbershop");
+        mensagem.setText(
+                "Olá, " + usuario.getNome() + "!\n\n" +
+                "Sua nova senha é: " + novaSenha + "\n\n" +
+                "Recomendamos que você altere essa senha após entrar no sistema."
+        );
+
+        mailSender.send(mensagem);
+    }
+
+    private String gerarSenhaAleatoria() {
+        StringBuilder senha = new StringBuilder(TAMANHO_SENHA_TEMPORARIA);
+
+        for (int i = 0; i < TAMANHO_SENHA_TEMPORARIA; i++) {
+            int indice = RANDOM.nextInt(CARACTERES_SENHA.length());
+            senha.append(CARACTERES_SENHA.charAt(indice));
+        }
+
+        return senha.toString();
+    }
 }
 
 
