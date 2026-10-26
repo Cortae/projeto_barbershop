@@ -1,0 +1,34 @@
+CREATE TABLE IF NOT EXISTS api_request_log (
+  id_api_request_log BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  request_id CHAR(36) NOT NULL,
+  started_at DATETIME(3) NOT NULL,
+  finished_at DATETIME(3) NOT NULL,
+  duration_ms INT UNSIGNED NOT NULL,
+  event_type VARCHAR(30) NOT NULL,
+  http_method VARCHAR(10) NOT NULL,
+  endpoint VARCHAR(500) NOT NULL,
+  query_params JSON NULL,
+  request_headers JSON NULL,
+  request_body JSON NULL,
+  request_body_bytes INT UNSIGNED NOT NULL DEFAULT 0,
+  request_body_truncated BOOLEAN NOT NULL DEFAULT FALSE,
+  response_status SMALLINT UNSIGNED NOT NULL,
+  response_headers JSON NULL,
+  response_body JSON NULL,
+  response_body_bytes INT UNSIGNED NOT NULL DEFAULT 0,
+  response_body_truncated BOOLEAN NOT NULL DEFAULT FALSE,
+  source_ip VARCHAR(45) NULL,
+  user_agent VARCHAR(500) NULL,
+  fk_usuario INT NULL,
+  error_code VARCHAR(50) NULL,
+  PRIMARY KEY (id_api_request_log),
+  UNIQUE KEY uq_api_request_log_request_id (request_id),
+  KEY idx_api_request_log_started_at (started_at),
+  KEY idx_api_request_log_status (response_status),
+  KEY idx_api_request_log_event_type (event_type),
+  KEY idx_api_request_log_usuario_started_at (fk_usuario, started_at),
+  CONSTRAINT fk_api_request_log_usuario
+    FOREIGN KEY (fk_usuario) REFERENCES usuario (id_usuario)
+    ON DELETE SET NULL
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

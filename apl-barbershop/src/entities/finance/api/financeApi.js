@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { db, request } from '@/shared/api'
 import { fetchAppointments } from '@/entities/appointment'
+import { fetchExpenses } from '@/entities/expense'
 
 export const financeKeys = { all: ['finance'], month: (month) => ['finance', month] }
 
@@ -13,7 +13,7 @@ const monthEnd = (month) => {
 export async function fetchFinanceSummary(month) {
   const [appointments, expenses] = await Promise.all([
     fetchAppointments(`${month}-01`, monthEnd(month)),
-    request(() => db.despesas.filter((expense) => expense.data.startsWith(month))),
+    fetchExpenses(month),
   ])
   const done = appointments.filter((appointment) => appointment.status === 'concluido')
   const gross = done.reduce((total, appointment) => total + appointment.valor, 0)
