@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.apl_api_barbershop.dto.LoginRequest;
+import school.sptech.apl_api_barbershop.dto.RecuperarSenhaRequestDto;
 import school.sptech.apl_api_barbershop.dto.UsuarioResponse;
 import school.sptech.apl_api_barbershop.service.UsuarioService;
 
@@ -56,5 +57,27 @@ public class AutenticacaoController {
         UsuarioResponse response = usuarioService.autenticar(request);
 
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Recuperar senha",
+            description = "Valida a existência de um usuário por email e envia uma nova senha para o email."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Nova senha gerada e enviada para o email"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Email informado não encontrado",
+                    content = @Content
+            )
+    })
+    @PostMapping("/recuperar-senha")
+    public ResponseEntity<Void> recuperarSenha(
+            @Valid @RequestBody RecuperarSenhaRequestDto request) {
+        usuarioService.enviarNovaSenha(request.getEmail());
+        return ResponseEntity.ok().build();
     }
 }

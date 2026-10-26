@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import ProtectedRoute from './ProtectedRoute'
 
 const LoginPage = lazy(() => import('@/pages/login'))
+const RecoverPasswordPage = lazy(() => import('@/pages/recover-password'))
 const HomePage = lazy(() => import('@/pages/home'))
 const SchedulePage = lazy(() => import('@/pages/schedule'))
 const AppointmentFormPage = lazy(() => import('@/pages/appointment-form'))
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       { path: '/login', element: <LoginPage /> },
+      { path: '/recuperar-senha', element: <RecoverPasswordPage /> },
       {
         element: <ProtectedRoute />,
         children: [
