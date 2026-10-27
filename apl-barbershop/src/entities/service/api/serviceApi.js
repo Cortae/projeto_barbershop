@@ -19,5 +19,6 @@ export const saveService = (service) => apiRequest(service.id ? `/servicos/${Num
     duracaoAtual: service.duracaoMinutos,
   }),
 }).then(mapService)
+export const deleteService = (id) => apiRequest(`/servicos/${Number(id)}`, { method: 'DELETE' })
 
 export const useServices = () => useQuery({ queryKey: serviceKeys.all, queryFn: fetchServices })

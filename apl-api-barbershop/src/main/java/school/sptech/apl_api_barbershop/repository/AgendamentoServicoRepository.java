@@ -10,6 +10,8 @@ public interface AgendamentoServicoRepository extends JpaRepository<AgendamentoS
 
     boolean existsByAgendamentoIdAgendamento(Integer id);
 
+    boolean existsByServicoId(Integer id);
+
     void deleteByAgendamentoIdAgendamento(Integer id);
 
     List<AgendamentoServico> findByAgendamentoIdAgendamento(Integer id);

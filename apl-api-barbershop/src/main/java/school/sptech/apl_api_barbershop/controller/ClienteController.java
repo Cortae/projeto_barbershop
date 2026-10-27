@@ -175,4 +175,21 @@ public class ClienteController {
 
         return ResponseEntity.ok(historico);
     }
+
+    @Operation(
+            summary = "Excluir cliente",
+            description = "Exclui um cliente que não possua agendamentos."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Cliente excluído"),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Cliente vinculado a agendamentos", content = @Content)
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(
+            @Parameter(description = "Identificador do cliente", example = "1")
+            @PathVariable Integer id) {
+        service.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
 }

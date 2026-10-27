@@ -2,9 +2,13 @@
 package school.sptech.apl_api_barbershop.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.sptech.apl_api_barbershop.dto.servico.ServicoRequest;
 import school.sptech.apl_api_barbershop.dto.servico.ServicoResponse;
 import school.sptech.apl_api_barbershop.entity.Servico;
+import school.sptech.apl_api_barbershop.exception.BusinessConflictException;
+import school.sptech.apl_api_barbershop.exception.NotFoundException;
+import school.sptech.apl_api_barbershop.repository.AgendamentoServicoRepository;
 import school.sptech.apl_api_barbershop.repository.ServicoRepository;
 
 import java.util.List;
@@ -14,9 +18,11 @@ import java.util.Optional;
 public class ServicoService {
 
     private final ServicoRepository repository;
+    private final AgendamentoServicoRepository agendamentoServicoRepository;
 
-    public ServicoService(ServicoRepository repository) {
+    public ServicoService(ServicoRepository repository, AgendamentoServicoRepository agendamentoServicoRepository) {
         this.repository = repository;
+        this.agendamentoServicoRepository = agendamentoServicoRepository;
     }
 
     public ServicoResponse cadastrar(ServicoRequest request) {
@@ -103,6 +109,18 @@ public class ServicoService {
         Servico servicoAtualizado = repository.save(servico);
 
         return converterParaResponse(servicoAtualizado);
+    }
+
+    @Transactional
+    public void excluir(Integer id) {
+        Servico servico = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Serviço não encontrado"));
+
+        if (agendamentoServicoRepository.existsByServicoId(id)) {
+            throw new BusinessConflictException("Não é possível excluir um serviço que possui agendamentos");
+        }
+
+        repository.delete(servico);
     }
 
     private ServicoResponse converterParaResponse(Servico servico) {

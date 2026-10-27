@@ -4,6 +4,7 @@ import school.sptech.apl_api_barbershop.dto.cliente.ClienteHistoricoResponse;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.sptech.apl_api_barbershop.dto.cliente.ClienteItemResponse;
 import school.sptech.apl_api_barbershop.dto.cliente.ClienteRequest;
 import school.sptech.apl_api_barbershop.dto.cliente.ClienteResponse;
@@ -24,6 +25,8 @@ import java.util.Optional;
 import school.sptech.apl_api_barbershop.dto.cliente.ClienteHistoricoServicoResponse;
 import school.sptech.apl_api_barbershop.entity.AgendamentoServico;
 import school.sptech.apl_api_barbershop.repository.AgendamentoServicoRepository;
+import school.sptech.apl_api_barbershop.exception.BusinessConflictException;
+import school.sptech.apl_api_barbershop.exception.NotFoundException;
 
 @Service
 public class ClienteService {
@@ -256,5 +259,17 @@ public class ClienteService {
         });
 
         return historico;
+    }
+
+    @Transactional
+    public void excluir(Integer id) {
+        Cliente cliente = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Cliente não encontrado"));
+
+        if (agendamentoRepository.existsByClienteId(id)) {
+            throw new BusinessConflictException("Não é possível excluir um cliente que possui agendamentos");
+        }
+
+        repository.delete(cliente);
     }
 }

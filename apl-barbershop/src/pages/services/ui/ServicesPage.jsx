@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Pencil, Scissors } from 'lucide-react'
 import { AppLayout } from '@/widgets/app-layout'
 import { ServiceFormSheet } from '@/features/service/upsert-service'
+import { DeleteServiceButton } from '@/features/service/delete-service'
 import { useServices, ServiceCard } from '@/entities/service'
 import { Button, EmptyState, ErrorState, SkeletonList } from '@/shared/ui'
 
@@ -22,7 +23,15 @@ export default function ServicesPage() {
           <ul className="grid gap-3 lg:grid-cols-2">
             {data.map((s) => (
               <li key={s.id}>
-                <ServiceCard service={s} action={<Button variant="icon" size="icon" icon={Pencil} aria-label={`Editar ${s.nome}`} onClick={() => setEditing(s)} />} />
+                <ServiceCard
+                  service={s}
+                  action={
+                    <div className="flex gap-2">
+                      <Button variant="icon" size="icon" icon={Pencil} aria-label={`Editar ${s.nome}`} onClick={() => setEditing(s)} />
+                      <DeleteServiceButton service={s} />
+                    </div>
+                  }
+                />
               </li>
             ))}
           </ul>

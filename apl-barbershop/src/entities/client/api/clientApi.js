@@ -24,6 +24,7 @@ export const saveClient = (client) => apiRequest(client.id ? `/clientes/${Number
   method: client.id ? 'PUT' : 'POST',
   body: JSON.stringify(payload(client)),
 }).then(mapClient)
+export const deleteClient = (id) => apiRequest(`/clientes/${Number(id)}`, { method: 'DELETE' })
 
 export const useClients = () => useQuery({ queryKey: clientKeys.all, queryFn: fetchClients })
 export const useClient = (id) => useQuery({

@@ -3,6 +3,7 @@ import { CalendarPlus } from 'lucide-react'
 import { AppLayout } from '@/widgets/app-layout'
 import { ClientHistory } from '@/widgets/client-history'
 import { ClientForm } from '@/features/client/upsert-client'
+import { DeleteClientButton } from '@/features/client/delete-client'
 import { useClient } from '@/entities/client'
 import { Button, SkeletonList, ErrorState } from '@/shared/ui'
 import { ROUTES } from '@/shared/config'
@@ -30,6 +31,7 @@ export default function ClientPage() {
           <div className="flex flex-col gap-4">
             <ClientHistory clienteId={id} />
             <Button variant="secondary" icon={CalendarPlus} onClick={() => navigate(`${ROUTES.appointmentNew}?clienteId=${id}`)}>Agendar corte</Button>
+            <DeleteClientButton client={data} onDeleted={() => navigate(ROUTES.clients, { replace: true })} />
           </div>
         )}
       </div>

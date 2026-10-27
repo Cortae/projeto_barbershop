@@ -201,4 +201,21 @@ public class ServicoController {
 
         return ResponseEntity.ok(servico);
     }
+
+    @Operation(
+            summary = "Excluir serviço",
+            description = "Exclui um serviço que não esteja vinculado a agendamentos."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Serviço excluído"),
+            @ApiResponse(responseCode = "404", description = "Serviço não encontrado", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Serviço vinculado a agendamentos", content = @Content)
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(
+            @Parameter(description = "Identificador do serviço", example = "1")
+            @PathVariable Integer id) {
+        service.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
 }

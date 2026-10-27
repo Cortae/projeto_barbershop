@@ -34,6 +34,8 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Intege
     );
 
     List<Agendamento> findByClienteId(Integer id);
+
+    boolean existsByClienteId(Integer id);
            
     List<Agendamento> findByCliente_IdAndStatusAgendamento_TituloIgnoreCaseOrderByHorarioInicioDesc(
             Integer id,
