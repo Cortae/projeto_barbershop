@@ -61,7 +61,9 @@ export default function AppLayout({ title, variant, back, menu, primaryAction, c
         </div>
         <div className="flex items-center gap-3">
           {primaryAction && (
-            <Button size="sm" icon={Plus} className="hidden lg:inline-flex" onClick={primaryAction.onClick}>{primaryAction.label}</Button>
+            <div className="hidden lg:block">
+              <Button size="sm" icon={Plus} onClick={primaryAction.onClick}>{primaryAction.label}</Button>
+            </div>
           )}
           {menu}
           <div className={variant === 'home' ? '' : 'hidden lg:block'}><AvatarMenu /></div>
