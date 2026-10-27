@@ -8,9 +8,11 @@ const mapService = (service) => ({
   nome: service.titulo,
   valor: Number(service.valor ?? service.valorAtual),
   duracaoMinutos: service.duracao ?? service.duracaoAtual,
+  ativo: service.ativo,
 })
 
-export const fetchServices = () => apiRequest('/servicos').then((items) => items.map(mapService))
+export const fetchServices = () =>
+  apiRequest('/servicos?ativo=true').then((items) => items.map(mapService).filter((service) => service.ativo))
 export const saveService = (service) => apiRequest(service.id ? `/servicos/${Number(service.id)}` : '/servicos', {
   method: service.id ? 'PUT' : 'POST',
   body: JSON.stringify({
@@ -19,6 +21,9 @@ export const saveService = (service) => apiRequest(service.id ? `/servicos/${Num
     duracaoAtual: service.duracaoMinutos,
   }),
 }).then(mapService)
-export const deleteService = (id) => apiRequest(`/servicos/${Number(id)}`, { method: 'DELETE' })
+export const deactivateService = (id) => apiRequest(`/servicos/${Number(id)}/ativo`, {
+  method: 'PATCH',
+  body: JSON.stringify({ ativo: false }),
+}).then(mapService)
 
 export const useServices = () => useQuery({ queryKey: serviceKeys.all, queryFn: fetchServices })
