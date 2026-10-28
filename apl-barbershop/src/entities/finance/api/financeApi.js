@@ -42,7 +42,7 @@ export async function fetchFinanceSummary(month) {
     semanas: weeks.map((week, index) => ({
       rotulo: `Sem ${index + 1}`,
       valorBruto: week.valorBruto,
-      valorLiquido: Math.max(0, week.valorBruto - week.despesas),
+      despesas: week.despesas,
     })),
     porServico: byService,
     pendentes: pending.sort((a, b) => b.horarioInicio.localeCompare(a.horarioInicio)),

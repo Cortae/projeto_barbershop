@@ -1,34 +1,87 @@
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  LinearScale,
+  Tooltip,
+} from 'chart.js'
+import { Bar } from 'react-chartjs-2'
 import { formatMoney } from '@/shared/lib/format'
 
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip)
+
+const chartColor = (name, fallback) => {
+  if (typeof document === 'undefined') return fallback
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback
+}
+
 export function ProfitChart({ weeks }) {
-  const max = Math.max(1, ...weeks.map((w) => w.valorBruto))
-  const empty = weeks.every((w) => w.valorBruto === 0)
-  const description = weeks.map((w) => `${w.rotulo}: bruto ${formatMoney(w.valorBruto)}, líquido ${formatMoney(w.valorLiquido)}`).join('; ')
+  const empty = weeks.every((week) => week.valorBruto === 0 && week.despesas === 0)
+  const description = weeks.map((w) => `${w.rotulo}: bruto ${formatMoney(w.valorBruto)}, despesas ${formatMoney(w.despesas)}`).join('; ')
+  const data = {
+    labels: weeks.map((week) => week.rotulo),
+    datasets: [
+      {
+        label: 'Bruto',
+        data: weeks.map((week) => week.valorBruto),
+        borderColor: chartColor('--color-primaria', '#22c55e'),
+        backgroundColor: chartColor('--color-primaria', '#22c55e'),
+        borderRadius: 4,
+      },
+      {
+        label: 'Despesas',
+        data: weeks.map((week) => week.despesas),
+        borderColor: chartColor('--color-alerta', '#f59e0b'),
+        backgroundColor: chartColor('--color-alerta', '#f59e0b'),
+        borderRadius: 4,
+      },
+    ],
+  }
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      tooltip: {
+        callbacks: { label: ({ dataset, parsed }) => `${dataset.label}: ${formatMoney(parsed.y)}` },
+      },
+    },
+    scales: {
+      x: {
+        border: { color: chartColor('--color-borda', '#2a2a2a') },
+        grid: { display: false },
+        ticks: { color: chartColor('--color-texto-secundario', '#a1a1aa') },
+      },
+      y: {
+        beginAtZero: true,
+        border: { display: false },
+        grid: { color: chartColor('--color-borda', '#2a2a2a') },
+        ticks: {
+          color: chartColor('--color-texto-secundario', '#a1a1aa'),
+          callback: (value) => formatMoney(value),
+        },
+      },
+    },
+  }
   return (
     <section aria-labelledby="lucro-mes" className="rounded-12 border border-borda bg-superficie p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id="lucro-mes" className="texto-h3">Lucro no mês</h2>
+        <h2 id="lucro-mes" className="texto-h3">Receita no mês</h2>
         <ul className="texto-corpo-pequeno flex gap-4 text-texto-secundario">
-          <li className="flex items-center gap-2"><span className="size-3 rounded-sm bg-primaria" /> Bruto</li>
-          <li className="flex items-center gap-2"><span className="hachura-liquido size-3 rounded-sm border border-primaria-hover" /> Líquido</li>
+          <li className="flex items-center gap-2"><span className="h-0.5 w-4 bg-primaria" /> Bruto</li>
+          <li className="flex items-center gap-2"><span className="h-2 w-4 rounded-sm bg-alerta" /> Despesas</li>
         </ul>
       </div>
       <p className="sr-only">{description}</p>
-      <div className="mt-4 flex h-44 items-end gap-4 border-b border-borda" aria-hidden>
-        {empty ? (
-          <p className="texto-corpo-pequeno m-auto text-texto-secundario">Sem movimento neste mês.</p>
-        ) : (
-          weeks.map((w) => (
-            <div key={w.label} className="flex h-full flex-1 items-end justify-center gap-1">
-              <div className="w-1/3 max-w-8 rounded-t-[4px] bg-primaria" style={{ height: `${(w.valorBruto / max) * 100}%` }} />
-              <div className="hachura-liquido w-1/3 max-w-8 rounded-t-[4px] border border-primaria-hover" style={{ height: `${(w.valorLiquido / max) * 100}%` }} />
-            </div>
-          ))
-        )}
-      </div>
-      <div className="mt-2 flex gap-4" aria-hidden>
-        {weeks.map((w) => <span key={w.label} className="texto-corpo-pequeno flex-1 text-center text-texto-secundario">{w.label}</span>)}
-      </div>
+      {empty ? (
+        <div className="texto-corpo-pequeno mt-4 flex h-52 items-center justify-center text-texto-secundario">
+          Sem movimento neste mês.
+        </div>
+      ) : (
+        <div className="mt-4 h-52">
+          <Bar data={data} options={options} role="img" aria-label={description} />
+        </div>
+      )}
     </section>
   )
 }
