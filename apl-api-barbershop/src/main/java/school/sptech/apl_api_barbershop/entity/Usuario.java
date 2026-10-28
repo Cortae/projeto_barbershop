@@ -15,9 +15,6 @@ public class Usuario {
     private String celular;
     private String senha;
 
-    @Column(name = "google_sub")
-    private String googleSub;
-
     @ManyToOne
     @JoinColumn(name = "fk_tipo_usuario", nullable = false)
     private TipoUsuario tipoUsuario;
@@ -25,13 +22,12 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(Integer id, String nome, String email, String celular, String senha, String googleSub, TipoUsuario tipoUsuario) {
+    public Usuario(Integer id, String nome, String email, String celular, String senha, TipoUsuario tipoUsuario) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.celular = celular;
         this.senha = senha;
-        this.googleSub = googleSub;
         this.tipoUsuario = tipoUsuario;
     }
 
@@ -74,15 +70,7 @@ public class Usuario {
     public void setSenha(String senha) {
         this.senha = senha;
     }
-
-    public String getGoogleSub() {
-        return googleSub;
-    }
-
-    public void setGoogleSub(String googleSub) {
-        this.googleSub = googleSub;
-    }
-
+    
     public TipoUsuario getTipoUsuario() {
         return tipoUsuario;
     }
