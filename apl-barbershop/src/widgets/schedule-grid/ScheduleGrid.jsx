@@ -85,7 +85,7 @@ export function WeekGrid({ date, appointments, onSelectDay }) {
     <div className="-mx-4 overflow-x-auto px-4">
       <div className="grid min-w-[700px] grid-cols-7 gap-2">
         {weekDays(date).map((d) => {
-          const list = appointments.filter((a) => a.horarioInicio.startsWith(d))
+          const list = appointments.filter((a) => a.status !== 'cancelado' && a.horarioInicio.startsWith(d))
           const isToday = d === t
           return (
             <div key={d} className="flex flex-col gap-2">

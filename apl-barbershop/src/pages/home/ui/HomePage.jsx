@@ -15,6 +15,7 @@ export default function HomePage() {
   const t = today()
   const { data, isLoading, isError, refetch } = useAppointments(t, t)
   const now = new Date().toTimeString().slice(0, 5)
+  const activeAppointments = data?.filter((a) => a.status !== 'cancelado') ?? []
   const scheduled = data?.filter((a) => a.status === 'agendado') ?? []
   const next = scheduled.find((a) => a.horarioInicio.slice(11, 16) >= now) ?? scheduled[0]
 
@@ -26,7 +27,7 @@ export default function HomePage() {
           {isLoading ? (
             <Skeleton className="mt-2 h-6 w-48" />
           ) : (
-            data && <p className="mt-1 text-texto-secundario">Você tem {data.length} {data.length === 1 ? 'corte' : 'cortes'} hoje.</p>
+            data && <p className="mt-1 text-texto-secundario">Você tem {activeAppointments.length} {activeAppointments.length === 1 ? 'corte' : 'cortes'} hoje.</p>
           )}
         </div>
         {isError && <ErrorState title="Não foi possível carregar a agenda de hoje" onRetry={refetch} />}
@@ -43,7 +44,7 @@ export default function HomePage() {
               <NextAppointment appointment={next} />
               <DaySummary appointments={data} />
             </div>
-            <TodayAgenda appointments={data} />
+            <TodayAgenda appointments={activeAppointments} />
           </>
         )}
       </div>

@@ -2,11 +2,11 @@ import { useNavigate } from 'react-router'
 import { Card } from '@/shared/ui'
 import { formatMoney } from '@/shared/lib/format'
 import { ROUTES } from '@/shared/config'
+import { summarizeAppointments } from './model/summary'
 
 export default function DaySummary({ appointments }) {
   const navigate = useNavigate()
-  const received = appointments.filter((a) => a.statusPagamento === 'pago').reduce((s, a) => s + a.valor, 0)
-  const toReceive = appointments.filter((a) => a.status === 'agendado' || a.statusPagamento === 'pendente').reduce((s, a) => s + a.valor, 0)
+  const { received, toReceive } = summarizeAppointments(appointments)
   return (
     <Card onClick={() => navigate(ROUTES.finance)} chevron aria-label={`Hoje: recebido ${formatMoney(received)}, a receber ${formatMoney(toReceive)}. Abrir financeiro`}>
       <h2 className="texto-h3">Hoje</h2>

@@ -10,7 +10,7 @@ export function buildDaySlots(date, hours, appointments, blocks) {
   if (!hours.dias.includes(fromISODate(date).getDay())) return []
   const open = timeToMinutes(hours.horarioAbertura)
   const close = timeToMinutes(hours.horarioFechamento)
-  const dayAppts = appointments.filter((a) => a.horarioInicio.slice(0, 10) === date)
+  const dayAppts = appointments.filter((a) => a.status !== 'cancelado' && a.horarioInicio.slice(0, 10) === date)
   const dayBlocks = blocks.filter((b) => b.data === date)
   if (hours.inicioIntervalo && hours.fimIntervalo) dayBlocks.push({ inicio: hours.inicioIntervalo, fim: hours.fimIntervalo, motivo: 'Intervalo' })
 
