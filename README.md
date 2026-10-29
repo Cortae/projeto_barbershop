@@ -1,5 +1,9 @@
 # Projeto Barbershop
 
+<p align="center">
+  <img src="apl-barbershop/public/logo.png" alt="Logo JR Barbershop" width="420" />
+</p>
+
 Aplicação web para gerenciamento de barbearia, com agenda, clientes, serviços, expediente e controle financeiro.
 
 ## Arquitetura
