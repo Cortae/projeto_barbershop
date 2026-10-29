@@ -11,7 +11,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema db_barbershop
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `db_barbershop` DEFAULT CHARACTER SET utf8 ;
+CREATE SCHEMA IF NOT EXISTS `db_barbershop` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `db_barbershop` ;
 
 -- -----------------------------------------------------
@@ -35,12 +35,10 @@ CREATE TABLE IF NOT EXISTS `db_barbershop`.`usuario` (
   `celular` VARCHAR(11) NULL,
   `fk_tipo_usuario` INT NOT NULL,
   `senha` VARCHAR(255) NULL,
-  `google_sub` VARCHAR(255) NULL,
   PRIMARY KEY (`id_usuario`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
   UNIQUE INDEX `celular_UNIQUE` (`celular` ASC) VISIBLE,
   INDEX `fk_usuario_tipo_usuario_idx` (`fk_tipo_usuario` ASC) VISIBLE,
-  UNIQUE INDEX `google_sub_UNIQUE` (`google_sub` ASC) VISIBLE,
   CONSTRAINT `fk_usuario_tipo_usuario`
     FOREIGN KEY (`fk_tipo_usuario`)
     REFERENCES `db_barbershop`.`tipo_usuario` (`id_tipo_usuario`)
@@ -55,7 +53,8 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `db_barbershop`.`status_agendamento` (
   `id_status_agendamento` INT NOT NULL AUTO_INCREMENT,
   `titulo` VARCHAR(30) NOT NULL,
-  PRIMARY KEY (`id_status_agendamento`))
+  PRIMARY KEY (`id_status_agendamento`),
+  UNIQUE INDEX `titulo_UNIQUE` (`titulo` ASC) VISIBLE)
 ENGINE = InnoDB;
 
 
@@ -90,8 +89,8 @@ CREATE TABLE IF NOT EXISTS `db_barbershop`.`pagamento` (
   `id_pagamento` INT NOT NULL AUTO_INCREMENT,
   `valor` DECIMAL(10,2) NOT NULL,
   `pago` TINYINT(1) NOT NULL,
-  `data_pagamento` DATE NOT NULL,
-  `fk_forma_pagamento` INT NOT NULL,
+  `data_pagamento` DATETIME NULL,
+  `fk_forma_pagamento` INT NULL,
   PRIMARY KEY (`id_pagamento`),
   INDEX `fk_pagamento_forma_pagamento1_idx` (`fk_forma_pagamento` ASC) VISIBLE,
   CONSTRAINT `fk_pagamento_forma_pagamento1`
@@ -151,21 +150,20 @@ CREATE TABLE IF NOT EXISTS `db_barbershop`.`servico` (
   `valor_atual` DECIMAL(10,2) NOT NULL,
   `duracao_atual` INT NOT NULL,
   `ativo` TINYINT NOT NULL,
-  PRIMARY KEY (`id_servico`),
-  UNIQUE INDEX `titulo_UNIQUE` (`titulo` ASC) VISIBLE)
+  PRIMARY KEY (`id_servico`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `db_barbershop`.`agendamento_servicos`
+-- Table `db_barbershop`.`agendamento_servico`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `db_barbershop`.`agendamento_servicos` (
-  `id_agendamento_servicos` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `db_barbershop`.`agendamento_servico` (
+  `id_agendamento_servico` INT NOT NULL AUTO_INCREMENT,
   `fk_agendamento` INT NOT NULL,
   `fk_servico` INT NOT NULL,
   `valor_unitario` DECIMAL(10,2) NOT NULL,
   `duracao` INT NOT NULL,
-  PRIMARY KEY (`id_agendamento_servicos`),
+  PRIMARY KEY (`id_agendamento_servico`),
   INDEX `fk_agendamento_servicos_agendamento1_idx` (`fk_agendamento` ASC) VISIBLE,
   INDEX `fk_agendamento_servicos_servico1_idx` (`fk_servico` ASC) VISIBLE,
   UNIQUE INDEX `uq_agendamento_servico` (`fk_agendamento` ASC, `fk_servico` ASC) VISIBLE,
@@ -186,23 +184,23 @@ ENGINE = InnoDB;
 -- Table `db_barbershop`.`api_request_log`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `db_barbershop`.`api_request_log` (
-  `id_api_request_log` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_api_request_log` BIGINT NOT NULL AUTO_INCREMENT,
   `request_id` CHAR(36) NOT NULL,
   `started_at` DATETIME(3) NOT NULL,
   `finished_at` DATETIME(3) NOT NULL,
-  `duration_ms` INT UNSIGNED NOT NULL,
+  `duration_ms` BIGINT NOT NULL,
   `event_type` VARCHAR(30) NOT NULL,
   `http_method` VARCHAR(10) NOT NULL,
   `endpoint` VARCHAR(500) NOT NULL,
   `query_params` JSON NULL,
   `request_headers` JSON NULL,
   `request_body` JSON NULL,
-  `request_body_bytes` INT UNSIGNED NOT NULL DEFAULT 0,
+  `request_body_bytes` BIGINT NOT NULL DEFAULT 0,
   `request_body_truncated` TINYINT(1) NOT NULL DEFAULT 0,
-  `response_status` SMALLINT UNSIGNED NOT NULL,
+  `response_status` SMALLINT NOT NULL,
   `response_headers` JSON NULL,
   `response_body` JSON NULL,
-  `response_body_bytes` INT UNSIGNED NOT NULL DEFAULT 0,
+  `response_body_bytes` BIGINT NOT NULL DEFAULT 0,
   `response_body_truncated` TINYINT(1) NOT NULL DEFAULT 0,
   `source_ip` VARCHAR(45) NULL,
   `user_agent` VARCHAR(500) NULL,
