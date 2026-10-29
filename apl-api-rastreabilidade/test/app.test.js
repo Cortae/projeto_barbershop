@@ -161,3 +161,23 @@ test('politica closed devolve 503 quando a auditoria falha', async (context) => 
   assert.equal(response.status, 503)
   assert.equal((await response.json()).code, 'AUDIT_UNAVAILABLE')
 })
+
+test('valida o endpoint proprio do relatorio antes do proxy', async (context) => {
+  const logs = []
+  const gateway = createApp({
+    config: loadConfig({ SPRING_API_URL: 'http://127.0.0.1:1' }),
+    auditRepository: repository(logs),
+  }).listen(0, '127.0.0.1')
+  context.after(() => gateway.close())
+  await new Promise((resolve) => gateway.once('listening', resolve))
+
+  const response = await fetch(`http://127.0.0.1:${gateway.address().port}/relatorios/financeiro/pdf`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ mes: 'invalido', resumo: {} }),
+  })
+
+  assert.equal(response.status, 400)
+  assert.match((await response.json()).message, /m.s v.lido/i)
+  assert.equal(logs.length, 0)
+})

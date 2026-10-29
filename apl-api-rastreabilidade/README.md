@@ -18,10 +18,13 @@ Requisitos: Node.js 22+, MySQL 8 e o Spring em execução.
 
 ```bash
 npm install
+npx puppeteer browsers install chrome
 cp .env.example .env
 mysql -u <usuario-migration> -p db_barbershop < migrations/001_create_api_request_log.sql
 npm run dev
 ```
+
+O endpoint proprio `POST /relatorios/financeiro/pdf` recebe o mes e o resumo financeiro em JSON, gera um PDF A4 com Puppeteer e o devolve como anexo. Em producao, a imagem ou host do servico deve incluir o Chrome instalado pelo comando acima.
 
 A migration é manual e não é aplicada pela aplicação.
 

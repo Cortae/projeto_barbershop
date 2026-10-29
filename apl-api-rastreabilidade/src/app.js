@@ -1,5 +1,6 @@
 import express from 'express'
 import { createProxyRouter } from './routes/proxyRouter.js'
+import { generateFinanceReport } from './reports/financeReport.js'
 
 export function createApp({ config, auditRepository }) {
   const app = express()
@@ -18,6 +19,7 @@ export function createApp({ config, auditRepository }) {
   })
 
   app.use(express.raw({ type: '*/*', limit: config.requestBodyLimit }))
+  app.post('/relatorios/financeiro/pdf', generateFinanceReport)
   app.use(createProxyRouter({ config, auditRepository }))
 
   app.use((error, _req, res, _next) => {

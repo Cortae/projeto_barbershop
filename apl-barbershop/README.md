@@ -23,10 +23,13 @@ A escolha fica centralizada em `src/shared/api/httpClient.js`:
 VITE_USE_TRACE_API=false
 VITE_TRACE_API_URL=/trace-api
 VITE_BACKEND_API_URL=/backend-api
+VITE_REPORT_API_URL=/trace-api
 
 TRACE_API_PROXY_TARGET=http://localhost:3000
 BACKEND_API_PROXY_TARGET=http://localhost:8080
 ```
+
+`VITE_REPORT_API_URL` aponta para o Express, pois a geracao do relatorio financeiro mensal usa Puppeteer no servidor. O botao **Gerar relatorio mensal** baixa o PDF do mes selecionado.
 
 `false` usa React -> Spring. `true` usa React -> Express -> Spring. O Vite remove os prefixos locais antes de encaminhar; `/clientes` chega com esse mesmo path aos dois destinos. Reinicie o Vite após alterar variáveis `VITE_*`.
 
