@@ -1,29 +1,79 @@
 import puppeteer from 'puppeteer'
+import {
+  buildAuditLog,
+  errorBody,
+  gatewayResponse,
+  persistAudit,
+  validRequestId,
+} from '../routes/proxyRouter.js'
 
 const MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/
 
-export async function generateFinanceReport(req, res, next) {
-  if (!Buffer.isBuffer(req.body)) {
-    return res.status(400).json({ message: 'Dados do relat\u00f3rio inv\u00e1lidos.' })
+export function createFinanceReportHandler({ config, auditRepository, browserLauncher = (options) => puppeteer.launch(options) }) {
+  return async function financeReportHandler(req, res) {
+    const startedAt = new Date()
+    const requestId = validRequestId(req.get('x-request-id'))
+    const requestBody = Buffer.isBuffer(req.body) ? req.body : Buffer.alloc(0)
+    let result
+
+    try {
+      result = await generateFinanceReport(requestBody, browserLauncher)
+    } catch (error) {
+      console.error(error)
+      result = {
+        status: 500,
+        headers: { 'content-type': 'application/json; charset=utf-8' },
+        body: errorBody(500, 'REPORT_GENERATION_FAILED', 'Nao foi possivel gerar o relatorio.', requestId),
+        errorCode: 'REPORT_GENERATION_FAILED',
+      }
+    }
+
+    const log = buildAuditLog({
+      req,
+      requestId,
+      startedAt,
+      requestBody,
+      responseBody: result.body,
+      status: result.status,
+      responseHeaders: result.headers,
+      config,
+      errorCode: result.errorCode,
+    })
+
+    if (!(await persistAudit(log, auditRepository, config.auditFailureMode))) {
+      return gatewayResponse(res, 503, 'AUDIT_UNAVAILABLE', 'Nao foi possivel registrar a auditoria.', requestId)
+    }
+
+    return res.status(result.status).set(result.headers).set('X-Request-Id', requestId).send(result.body)
   }
+}
+
+async function generateFinanceReport(requestBody, browserLauncher) {
+  if (!requestBody.length) return jsonResponse(400, { message: 'Dados do relat\u00f3rio inv\u00e1lidos.' })
 
   let payload
   try {
-    payload = JSON.parse(req.body.toString('utf8'))
+    payload = JSON.parse(requestBody.toString('utf8'))
   } catch {
-    return res.status(400).json({ message: 'O corpo deve ser um JSON v\u00e1lido.' })
+    return jsonResponse(400, { message: 'O corpo deve ser um JSON v\u00e1lido.' })
   }
 
   const validationError = validate(payload)
-  if (validationError) return res.status(400).json({ message: validationError })
+  if (validationError) return jsonResponse(400, { message: validationError })
 
   let browser
   try {
-    browser = await puppeteer.launch({
+    browser = await browserLauncher({
       headless: true,
       pipe: true,
       timeout: 60_000,
-      args: ['--disable-dev-shm-usage', '--no-first-run', '--no-default-browser-check'],
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--no-first-run',
+        '--no-default-browser-check',
+      ],
     })
     const page = await browser.newPage()
     await page.setContent(renderReport(payload), { waitUntil: 'domcontentloaded' })
@@ -33,19 +83,28 @@ export async function generateFinanceReport(req, res, next) {
       margin: { top: '16mm', right: '14mm', bottom: '16mm', left: '14mm' },
     })
 
-    return res
-      .status(200)
-      .set({
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="relatorio-financeiro-${payload.mes}.pdf"`,
-        'Content-Length': String(pdf.length),
-        'Cache-Control': 'no-store',
-      })
-      .send(Buffer.from(pdf))
-  } catch (error) {
-    return next(error)
+    return {
+      status: 200,
+      headers: {
+        'content-type': 'application/pdf',
+        'content-disposition': `attachment; filename="relatorio-financeiro-${payload.mes}.pdf"`,
+        'content-length': String(pdf.length),
+        'cache-control': 'no-store',
+      },
+      body: Buffer.from(pdf),
+      errorCode: null,
+    }
   } finally {
     await browser?.close()
+  }
+}
+
+function jsonResponse(status, value) {
+  return {
+    status,
+    headers: { 'content-type': 'application/json; charset=utf-8' },
+    body: Buffer.from(JSON.stringify(value)),
+    errorCode: status >= 400 ? 'INVALID_REPORT_REQUEST' : null,
   }
 }
 

@@ -72,7 +72,7 @@ async function forward(req, res, config, auditRepository) {
   }
 }
 
-function validRequestId(value) {
+export function validRequestId(value) {
   return value && REQUEST_ID_PATTERN.test(value) ? value : randomUUID()
 }
 
@@ -99,7 +99,7 @@ function selectedResponseHeaders(headers) {
   return selected
 }
 
-function buildAuditLog({ req, requestId, startedAt, requestBody, responseBody, status, responseHeaders, config, errorCode = null }) {
+export function buildAuditLog({ req, requestId, startedAt, requestBody, responseBody, status, responseHeaders, config, errorCode = null }) {
   const finishedAt = new Date()
   const requestCapture = captureBody(requestBody, req.get('content-type'), config.auditBodyMaxBytes)
   const responseCapture = captureBody(responseBody, responseHeaders['content-type'], config.auditBodyMaxBytes)
@@ -147,7 +147,7 @@ function positiveInteger(value) {
   return Number.isSafeInteger(number) && number > 0 ? number : null
 }
 
-async function persistAudit(log, repository, failureMode) {
+export async function persistAudit(log, repository, failureMode) {
   try {
     await repository.save(log)
     return true
@@ -157,11 +157,11 @@ async function persistAudit(log, repository, failureMode) {
   }
 }
 
-function errorBody(status, code, message, requestId) {
+export function errorBody(status, code, message, requestId) {
   return Buffer.from(JSON.stringify({ timestamp: new Date().toISOString(), status, code, message, requestId }))
 }
 
-function gatewayResponse(res, status, code, message, requestId) {
+export function gatewayResponse(res, status, code, message, requestId) {
   return res.status(status).set('X-Request-Id', requestId).json({
     timestamp: new Date().toISOString(), status, code, message, requestId,
   })

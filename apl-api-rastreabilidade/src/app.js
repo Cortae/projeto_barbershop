@@ -1,8 +1,8 @@
 import express from 'express'
 import { createProxyRouter } from './routes/proxyRouter.js'
-import { generateFinanceReport } from './reports/financeReport.js'
+import { createFinanceReportHandler } from './reports/financeReport.js'
 
-export function createApp({ config, auditRepository }) {
+export function createApp({ config, auditRepository, reportBrowserLauncher }) {
   const app = express()
   app.disable('x-powered-by')
   app.set('trust proxy', config.trustProxy)
@@ -19,7 +19,11 @@ export function createApp({ config, auditRepository }) {
   })
 
   app.use(express.raw({ type: '*/*', limit: config.requestBodyLimit }))
-  app.post('/relatorios/financeiro/pdf', generateFinanceReport)
+  app.post('/relatorios/financeiro/pdf', createFinanceReportHandler({
+    config,
+    auditRepository,
+    browserLauncher: reportBrowserLauncher,
+  }))
   app.use(createProxyRouter({ config, auditRepository }))
 
   app.use((error, _req, res, _next) => {
