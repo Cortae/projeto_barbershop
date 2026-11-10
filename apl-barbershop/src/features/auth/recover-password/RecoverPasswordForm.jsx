@@ -61,7 +61,7 @@ export default function RecoverPasswordForm() {
           Enviamos uma nova senha para <strong>{email.trim()}</strong>. Verifique também a caixa de spam.
         </Banner>
         <Link
-          className="inline-flex min-h-14 w-full items-center justify-center rounded-8 bg-primaria px-6 font-semibold text-fundo hover:bg-primaria-hover"
+          className="inline-flex min-h-14 w-full items-center justify-center rounded-8 bg-primaria px-6 font-semibold text-sobre-destaque hover:bg-primaria-hover"
           to={ROUTES.login}
         >
           Voltar para o login

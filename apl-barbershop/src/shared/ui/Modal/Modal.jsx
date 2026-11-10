@@ -10,7 +10,7 @@ export default function Modal({ open, onClose, title, description, children }) {
       <button
         type="button"
         aria-label="Fechar modal"
-        className="absolute inset-0 bg-fundo/60"
+        className="absolute inset-0 bg-sobreposicao/60"
         onClick={onClose}
       />
       <div

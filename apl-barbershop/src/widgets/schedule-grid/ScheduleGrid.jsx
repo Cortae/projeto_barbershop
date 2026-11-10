@@ -92,7 +92,7 @@ export function WeekGrid({ date, appointments, onSelectDay }) {
               <button
                 onClick={() => onSelectDay(d)}
                 aria-label={`Ver ${weekdayShort(d)} ${d.slice(8)}`}
-                className={`flex min-h-11 flex-col items-center justify-center rounded-8 py-1 ${isToday ? 'bg-primaria text-fundo' : 'bg-superficie text-texto hover:bg-superficie-elevada'}`}
+                className={`flex min-h-11 flex-col items-center justify-center rounded-8 py-1 ${isToday ? 'bg-primaria text-sobre-destaque' : 'bg-superficie text-texto hover:bg-superficie-elevada'}`}
               >
                 <span className="texto-corpo-pequeno">{weekdayShort(d)}</span>
                 <span className="font-semibold tabular-nums">{d.slice(8)}</span>

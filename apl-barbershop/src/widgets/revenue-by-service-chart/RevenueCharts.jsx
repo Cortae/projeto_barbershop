@@ -8,6 +8,7 @@ import {
 import { Bar } from 'react-chartjs-2'
 import { formatMoney } from '@/shared/lib/format'
 import { formatFinancialValue } from '@/features/finance/toggle-financial-values'
+import { useTheme } from '@/features/theme/switch-theme'
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip)
 
@@ -17,6 +18,7 @@ const chartColor = (name, fallback) => {
 }
 
 export function ProfitChart({ weeks, valuesVisible = true }) {
+  const { theme } = useTheme()
   const empty = weeks.every((week) => week.valorBruto === 0 && week.despesas === 0)
   const description = valuesVisible
     ? weeks.map((w) => `${w.rotulo}: bruto ${formatMoney(w.valorBruto)}, despesas ${formatMoney(w.despesas)}`).join('; ')
@@ -86,7 +88,7 @@ export function ProfitChart({ weeks, valuesVisible = true }) {
         </div>
       ) : (
         <div className="mt-4 h-52">
-          <Bar data={data} options={options} role="img" aria-label={description} />
+          <Bar key={theme} data={data} options={options} role="img" aria-label={description} />
         </div>
       )}
     </section>

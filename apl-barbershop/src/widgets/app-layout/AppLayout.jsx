@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router'
 import { ChevronLeft, Plus } from 'lucide-react'
 import { Button } from '@/shared/ui'
+import { ThemeToggle } from '@/features/theme/switch-theme'
 import { NAV_ITEMS } from './navItems'
 import Logo from './Logo'
 import AvatarMenu from './AvatarMenu'
@@ -65,6 +66,7 @@ export default function AppLayout({ title, variant, back, menu, primaryAction, c
               <Button size="sm" icon={Plus} onClick={primaryAction.onClick}>{primaryAction.label}</Button>
             </div>
           )}
+          <ThemeToggle />
           {menu}
           <div className={variant === 'home' ? '' : 'hidden lg:block'}><AvatarMenu /></div>
           {!menu && variant !== 'home' && <div className="w-11 lg:hidden" />}
@@ -77,7 +79,7 @@ export default function AppLayout({ title, variant, back, menu, primaryAction, c
         <button
           type="button"
           onClick={primaryAction.onClick}
-          className="fixed bottom-20 right-4 z-30 flex h-14 items-center gap-2 rounded-full bg-primaria px-5 font-semibold text-fundo hover:bg-primaria-hover active:bg-primaria-pressionado lg:hidden"
+          className="fixed bottom-20 right-4 z-30 flex h-14 items-center gap-2 rounded-full bg-primaria px-5 font-semibold text-sobre-destaque hover:bg-primaria-hover active:bg-primaria-pressionado lg:hidden"
         >
           <Plus className="size-5" aria-hidden /> {primaryAction.label}
         </button>

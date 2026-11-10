@@ -11,7 +11,7 @@ export default function BottomSheet({ open, onClose, title, children, footer }) 
       <button
         type="button"
         aria-label="Fechar painel"
-        className="absolute inset-0 bg-fundo/60"
+        className="absolute inset-0 bg-sobreposicao/60"
         onClick={onClose}
       />
       <div
