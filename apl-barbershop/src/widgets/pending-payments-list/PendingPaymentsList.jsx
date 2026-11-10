@@ -5,8 +5,9 @@ import { formatMoney, formatDayMonth } from '@/shared/lib/format'
 import { ROUTES } from '@/shared/config'
 import { PaymentBadge } from '@/entities/payment'
 import { MarkAsPaidButton } from '@/features/appointment/mark-as-paid'
+import { formatFinancialValue } from '@/features/finance/toggle-financial-values'
 
-export default function PendingPaymentsList({ items }) {
+export default function PendingPaymentsList({ items, valuesVisible = true }) {
   const navigate = useNavigate()
   const total = items.reduce((s, a) => s + a.valor, 0)
   return (
@@ -15,7 +16,7 @@ export default function PendingPaymentsList({ items }) {
         <h2 id="pendentes" className="texto-h2">Pagamentos pendentes</h2>
         {items.length > 0 && (
           <p className="texto-corpo-pequeno mt-1 text-texto-secundario">
-            Falta receber {formatMoney(total)} de {items.length} {items.length === 1 ? 'cliente' : 'clientes'}.
+            Falta receber {formatFinancialValue(formatMoney(total), valuesVisible)} de {items.length} {items.length === 1 ? 'cliente' : 'clientes'}.
           </p>
         )}
       </div>
@@ -38,7 +39,7 @@ export default function PendingPaymentsList({ items }) {
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <span className="texto-corpo-pequeno tabular-nums text-texto-secundario">
-                    {formatDayMonth(a.horarioInicio)} · <span className="texto-valor text-alerta">{formatMoney(a.valor)}</span>
+                    {formatDayMonth(a.horarioInicio)} · <span className="texto-valor text-alerta">{formatFinancialValue(formatMoney(a.valor), valuesVisible)}</span>
                   </span>
                   <MarkAsPaidButton appointment={a} />
                 </div>

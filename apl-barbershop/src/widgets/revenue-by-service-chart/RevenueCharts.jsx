@@ -7,6 +7,7 @@ import {
 } from 'chart.js'
 import { Bar } from 'react-chartjs-2'
 import { formatMoney } from '@/shared/lib/format'
+import { formatFinancialValue } from '@/features/finance/toggle-financial-values'
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip)
 
@@ -15,9 +16,11 @@ const chartColor = (name, fallback) => {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback
 }
 
-export function ProfitChart({ weeks }) {
+export function ProfitChart({ weeks, valuesVisible = true }) {
   const empty = weeks.every((week) => week.valorBruto === 0 && week.despesas === 0)
-  const description = weeks.map((w) => `${w.rotulo}: bruto ${formatMoney(w.valorBruto)}, despesas ${formatMoney(w.despesas)}`).join('; ')
+  const description = valuesVisible
+    ? weeks.map((w) => `${w.rotulo}: bruto ${formatMoney(w.valorBruto)}, despesas ${formatMoney(w.despesas)}`).join('; ')
+    : 'Valores financeiros ocultos.'
   const data = {
     labels: weeks.map((week) => week.rotulo),
     datasets: [
@@ -73,7 +76,11 @@ export function ProfitChart({ weeks }) {
         </ul>
       </div>
       <p className="sr-only">{description}</p>
-      {empty ? (
+      {!valuesVisible ? (
+        <div className="texto-corpo-pequeno mt-4 flex h-52 items-center justify-center text-texto-secundario">
+          Valores financeiros ocultos.
+        </div>
+      ) : empty ? (
         <div className="texto-corpo-pequeno mt-4 flex h-52 items-center justify-center text-texto-secundario">
           Sem movimento neste mês.
         </div>
@@ -86,7 +93,7 @@ export function ProfitChart({ weeks }) {
   )
 }
 
-export function RevenueByService({ items }) {
+export function RevenueByService({ items, valuesVisible = true }) {
   return (
     <section aria-labelledby="fat-servico" className="rounded-12 border border-borda bg-superficie p-4">
       <h2 id="fat-servico" className="texto-h3">Faturamento por serviço</h2>
@@ -97,8 +104,10 @@ export function RevenueByService({ items }) {
           {items.map((s) => (
             <li key={s.servicoId} className="flex items-center gap-3 py-3">
               <span className="flex-1">{s.nome}</span>
-              <span className="texto-valor">{formatMoney(s.total)}</span>
-              <span className="texto-corpo-pequeno w-10 text-right tabular-nums text-texto-secundario">{s.percentual}%</span>
+              <span className="texto-valor">{formatFinancialValue(formatMoney(s.total), valuesVisible)}</span>
+              <span className="texto-corpo-pequeno w-10 text-right tabular-nums text-texto-secundario">
+                {valuesVisible ? `${s.percentual}%` : '••%'}
+              </span>
             </li>
           ))}
         </ul>

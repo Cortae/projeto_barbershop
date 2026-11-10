@@ -16,7 +16,9 @@ export default function LoginPage() {
           style={{ background: 'radial-gradient(60% 60% at 50% 0%, color-mix(in srgb, var(--color-primaria) 35%, transparent), transparent)' }}
         />
         <div className="relative flex flex-col gap-12 pt-12 lg:pt-0">
-          <Logo large />
+          <div className="flex justify-center">
+            <Logo large />
+          </div>
           <div>
             <h1 className="texto-h1">Entrar na JR Barbershop</h1>
             <p className="mt-3 text-texto-secundario">Sua agenda e seu caixa em um só lugar.</p>

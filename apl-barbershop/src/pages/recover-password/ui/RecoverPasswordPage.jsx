@@ -18,7 +18,9 @@ export default function RecoverPasswordPage() {
           style={{ background: 'radial-gradient(60% 60% at 50% 0%, color-mix(in srgb, var(--color-primaria) 35%, transparent), transparent)' }}
         />
         <div className="relative flex flex-col gap-12 pt-12 lg:pt-0">
-          <Logo large />
+          <div className="flex justify-center">
+            <Logo large />
+          </div>
           <div>
             <Link
               className="texto-corpo-pequeno mb-6 inline-flex items-center gap-2 font-medium text-primaria hover:underline"

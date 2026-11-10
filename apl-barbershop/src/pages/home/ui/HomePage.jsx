@@ -8,19 +8,34 @@ import { useSession } from '@/entities/barber'
 import { Skeleton, SkeletonList, ErrorState } from '@/shared/ui'
 import { greeting, today } from '@/shared/lib/date'
 import { ROUTES } from '@/shared/config'
+import {
+  FinancialValuesVisibilityButton,
+  useFinancialValuesVisibility,
+} from '@/features/finance/toggle-financial-values'
 
 export default function HomePage() {
   const navigate = useNavigate()
   const session = useSession()
   const t = today()
   const { data, isLoading, isError, refetch } = useAppointments(t, t)
+  const { valuesVisible, toggleValuesVisibility } = useFinancialValuesVisibility()
   const now = new Date().toTimeString().slice(0, 5)
   const activeAppointments = data?.filter((a) => a.status !== 'cancelado') ?? []
   const scheduled = data?.filter((a) => a.status === 'agendado') ?? []
   const next = scheduled.find((a) => a.horarioInicio.slice(11, 16) >= now) ?? scheduled[0]
 
   return (
-    <AppLayout title="Início" variant="home" primaryAction={{ label: 'Novo agendamento', onClick: () => navigate(ROUTES.appointmentNew) }}>
+    <AppLayout
+      title="Início"
+      variant="home"
+      primaryAction={{ label: 'Novo agendamento', onClick: () => navigate(ROUTES.appointmentNew) }}
+      menu={(
+        <FinancialValuesVisibilityButton
+          valuesVisible={valuesVisible}
+          onToggle={toggleValuesVisibility}
+        />
+      )}
+    >
       <div className="flex flex-col gap-6">
         <div>
           <h2 className="texto-h1">{greeting()}, {session?.nome}!</h2>
@@ -41,8 +56,8 @@ export default function HomePage() {
         {data && (
           <>
             <div className="grid gap-4 lg:grid-cols-2">
-              <NextAppointment appointment={next} />
-              <DaySummary appointments={data} />
+              <NextAppointment appointment={next} valuesVisible={valuesVisible} />
+              <DaySummary appointments={data} valuesVisible={valuesVisible} />
             </div>
             <TodayAgenda appointments={activeAppointments} />
           </>

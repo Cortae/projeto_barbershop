@@ -6,12 +6,25 @@ import { MonthSelector, useMonthParam } from '@/features/finance/select-finance-
 import { GenerateMonthlyReportButton } from '@/features/finance/generate-monthly-report'
 import { useFinanceSummary } from '@/entities/finance'
 import { Skeleton, ErrorState } from '@/shared/ui'
+import {
+  FinancialValuesVisibilityButton,
+  useFinancialValuesVisibility,
+} from '@/features/finance/toggle-financial-values'
 
 export default function FinancePage() {
   const [month] = useMonthParam()
   const { data, isLoading, isError, refetch } = useFinanceSummary(month)
+  const { valuesVisible, toggleValuesVisibility } = useFinancialValuesVisibility()
   return (
-    <AppLayout title="Financeiro">
+    <AppLayout
+      title="Financeiro"
+      menu={(
+        <FinancialValuesVisibilityButton
+          valuesVisible={valuesVisible}
+          onToggle={toggleValuesVisibility}
+        />
+      )}
+    >
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="w-full lg:max-w-sm"><MonthSelector disabled={isLoading} /></div>
@@ -26,12 +39,12 @@ export default function FinancePage() {
         )}
         {data && (
           <>
-            <FinanceKpis summary={data} />
+            <FinanceKpis summary={data} valuesVisible={valuesVisible} />
             <div className="grid gap-6 lg:grid-cols-2">
-              <ProfitChart weeks={data.semanas} />
-              <RevenueByService items={data.porServico} />
+              <ProfitChart weeks={data.semanas} valuesVisible={valuesVisible} />
+              <RevenueByService items={data.porServico} valuesVisible={valuesVisible} />
             </div>
-            <PendingPaymentsList items={data.pendentes} />
+            <PendingPaymentsList items={data.pendentes} valuesVisible={valuesVisible} />
           </>
         )}
       </div>
