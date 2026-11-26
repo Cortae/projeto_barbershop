@@ -1,0 +1,23 @@
+apiVersion: 1
+
+datasources:
+  - name: Barbershop MySQL
+    uid: barbershop-mysql
+    type: mysql
+    access: proxy
+    url: localhost:3306
+    database: db_barbershop
+    user: barbershop_grafana
+    isDefault: true
+    editable: true
+    jsonData:
+      database: db_barbershop
+      maxOpenConns: 10
+      maxIdleConns: 5
+      connMaxLifetime: 14400
+      mysqlVersionOption: "8.0"
+      timeInterval: 1s
+      timezone: "+00:00"
+    secureJsonData:
+      password: ${BARBERSHOP_DB_PASSWORD}
+
