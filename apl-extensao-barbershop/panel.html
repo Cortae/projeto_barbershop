@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Novo agendamento</title>
+    <link rel="stylesheet" href="panel.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo-shell">
+          <img src="assets/logo.png" alt="JR Barbershop" />
+        </span>
+        <div>
+          <p class="eyebrow">Agendamento rápido</p>
+          <h1>Novo agendamento</h1>
+        </div>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Ativar tema claro" title="Ativar tema claro">
+        <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" /></svg>
+        <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41" /></svg>
+      </button>
+    </header>
+
+    <main>
+      <section id="login-panel" class="card login-card">
+        <p class="eyebrow dark">Acesso restrito</p>
+        <h2>Entre para agendar</h2>
+        <p class="muted login-description">Use as mesmas credenciais do painel da barbearia.</p>
+        <form id="login-form" novalidate>
+          <label for="login-email">E-mail</label>
+          <input id="login-email" type="email" autocomplete="username" placeholder="admin@barbershop.test" />
+          <label for="login-password">Senha</label>
+          <input id="login-password" type="password" autocomplete="current-password" />
+          <p id="login-feedback" class="feedback" role="alert" aria-live="polite"></p>
+          <button id="login-submit" class="button submit" type="submit">Entrar</button>
+        </form>
+      </section>
+
+      <div id="appointment-content" hidden>
+        <section class="session-bar" aria-live="polite">
+          <div>
+            <strong id="session-user"></strong>
+            <span id="session-timer"></span>
+          </div>
+          <button id="logout" type="button">Sair</button>
+        </section>
+
+        <div id="connection-warning" class="alert" role="alert" hidden></div>
+
+        <form id="appointment-form" novalidate>
+          <section class="card">
+            <label for="barber">Barbeiro <span aria-hidden="true">*</span></label>
+            <select id="barber">
+              <option value="">Selecione o barbeiro</option>
+            </select>
+            <p id="barber-error" class="field-error"></p>
+          </section>
+
+          <section class="card">
+            <label for="client-search">Cliente <span aria-hidden="true">*</span></label>
+            <input id="client-search" type="search" autocomplete="off" placeholder="Busque por nome ou telefone" aria-controls="client-results" />
+            <input id="client-id" type="hidden" />
+            <div id="selected-client" class="selected-client" hidden></div>
+            <ul id="client-results" class="results" role="listbox" hidden></ul>
+            <p id="client-error" class="field-error"></p>
+          </section>
+
+        <section class="card">
+          <fieldset>
+            <legend>Serviços <span aria-hidden="true">*</span></legend>
+            <div id="services" class="services"><p class="muted">Carregando serviços…</p></div>
+          </fieldset>
+          <p id="services-error" class="field-error"></p>
+        </section>
+
+        <section class="card two-columns">
+          <div>
+            <label for="date">Data <span aria-hidden="true">*</span></label>
+            <input id="date" type="date" />
+            <p id="date-error" class="field-error"></p>
+          </div>
+          <div>
+            <label for="time">Horário <span aria-hidden="true">*</span></label>
+            <input id="time" type="time" step="300" />
+            <p id="time-error" class="field-error"></p>
+          </div>
+        </section>
+
+        <section id="summary" class="summary" hidden>
+          <span id="summary-duration"></span>
+          <strong id="summary-price"></strong>
+        </section>
+
+        <p id="form-feedback" class="feedback form-feedback" role="status" aria-live="polite"></p>
+          <button id="submit" class="button submit" type="submit">Salvar agendamento</button>
+        </form>
+      </div>
+    </main>
+
+    <dialog id="success-dialog" class="success-dialog" aria-labelledby="success-title" aria-describedby="success-message">
+      <form method="dialog">
+        <span class="success-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" /></svg>
+        </span>
+        <p class="eyebrow">Tudo certo</p>
+        <h2 id="success-title">Agendamento realizado</h2>
+        <p id="success-message" class="success-message"></p>
+        <button class="button submit" type="submit" autofocus>Concluir</button>
+      </form>
+    </dialog>
+
+    <script type="module" src="panel.js"></script>
+  </body>
+</html>

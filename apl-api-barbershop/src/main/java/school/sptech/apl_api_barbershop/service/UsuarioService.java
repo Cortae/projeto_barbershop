@@ -15,6 +15,7 @@ import school.sptech.apl_api_barbershop.repository.TipoUsuarioRepository;
 import school.sptech.apl_api_barbershop.repository.UsuarioRepository;
 
 import java.security.SecureRandom;
+import java.util.List;
 
 @Service
 public class UsuarioService {
@@ -102,6 +103,18 @@ public class UsuarioService {
                 usuario.getEmail(),
                 usuario.getTipoUsuario().getTitulo()
         );
+    }
+
+    public List<UsuarioResponse> listarBarbeiros() {
+        return usuarioRepository.findByTipoUsuario_TituloIgnoreCase("BARBEIRO")
+                .stream()
+                .map(usuario -> new UsuarioResponse(
+                        usuario.getId(),
+                        usuario.getNome(),
+                        usuario.getEmail(),
+                        usuario.getTipoUsuario().getTitulo()
+                ))
+                .toList();
     }
 
 

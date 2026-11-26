@@ -15,6 +15,7 @@ import school.sptech.apl_api_barbershop.dto.UsuarioResponse;
 import school.sptech.apl_api_barbershop.service.UsuarioService;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -89,5 +90,14 @@ public class UsuarioController {
         UsuarioResponse response = usuarioService.buscarPorId(id);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/barbeiros")
+    @Operation(
+            summary = "Listar barbeiros",
+            description = "Lista os usuários cadastrados com o perfil de barbeiro."
+    )
+    public ResponseEntity<List<UsuarioResponse>> listarBarbeiros() {
+        return ResponseEntity.ok(usuarioService.listarBarbeiros());
     }
 }
