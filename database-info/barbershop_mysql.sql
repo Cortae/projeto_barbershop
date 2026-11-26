@@ -1,3 +1,11 @@
+-- ============================================================
+-- db_barbershop - MySQL 8
+-- Cria o schema, as tabelas e os dados iniciais de desenvolvimento.
+-- Execute o arquivo inteiro (Ctrl+Shift+Enter) com um usuario administrativo.
+-- Para recriar do zero, descomente a linha abaixo (APAGA TODOS OS DADOS):
+-- DROP SCHEMA IF EXISTS `db_barbershop`;
+-- ============================================================
+
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -284,3 +292,118 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
+-- ============================================================
+-- Dados iniciais (desenvolvimento)
+-- Os IDs são gerados pelo AUTO_INCREMENT, em ordem de inserção
+-- (1, 2, 3...). As FKs abaixo dependem dessa ordem: não reordene
+-- as linhas e execute este arquivo apenas uma vez.
+-- ============================================================
+USE `db_barbershop`;
+
+-- Dados-base (o sistema busca estes registros pelo título)
+INSERT INTO tipo_usuario (titulo) VALUES
+  ('ADMINISTRADOR'),
+  ('BARBEIRO');
+
+INSERT INTO status_agendamento (titulo) VALUES
+  ('AGENDADO'),
+  ('CONCLUIDO'),
+  ('CANCELADO'),
+  ('EM_ANDAMENTO'),
+  ('NAO_COMPARECEU');
+
+INSERT INTO forma_pagamento (titulo) VALUES
+  ('PIX'),
+  ('DINHEIRO'),
+  ('CARTAO_CREDITO'),
+  ('CARTAO_DEBITO');
+
+-- Usuários (login por e-mail; a senha é comparada como texto no backend atual)
+INSERT INTO usuario (nome, email, celular, fk_tipo_usuario, senha) VALUES
+  ('admin_app', 'admin_app@barbershop.test', '11990000001', 1, 'senha123'),
+  ('Junior',    'junior@barbershop.test',    '11990000002', 2, 'senha123');
+
+INSERT INTO cliente (nome, apelido, celular) VALUES
+  ('Pedro Oliveira',  'Pedrinho', '11981110001'),
+  ('João Ferreira',   'Jota',     '11981110002'),
+  ('André Lima',      NULL,       '11981110003'),
+  ('Bruno Martins',   'Brunão',   '11981110004'),
+  ('Felipe Souza',    NULL,       '11981110005'),
+  ('Gustavo Rocha',   'Guga',     '11981110006'),
+  ('Matheus Ribeiro', NULL,       '11981110007'),
+  ('Diego Carvalho',  'Diego',    '11981110008');
+
+INSERT INTO servico (titulo, valor_atual, duracao_atual, ativo) VALUES
+  ('Corte tradicional', 45.00, 30, TRUE),
+  ('Barba',             30.00, 20, TRUE),
+  ('Corte + barba',     65.00, 50, TRUE),
+  ('Degradê',           50.00, 40, TRUE),
+  ('Sobrancelha',       15.00, 10, TRUE),
+  ('Hidratação',        25.00, 20, FALSE);
+
+-- Pagamentos (1 a 8: agendamentos de outubro; 9 a 12: agendamentos de 15/12)
+INSERT INTO pagamento (valor, pago, data_pagamento, fk_forma_pagamento) VALUES
+  (45.00, TRUE,  '2026-10-08', 1),
+  (30.00, TRUE,  '2026-10-09', 2),
+  (65.00, FALSE, NULL, NULL),
+  (50.00, FALSE, NULL, NULL),
+  (45.00, TRUE,  '2026-10-10', 4),
+  (80.00, TRUE,  '2026-10-11', 1),
+  (30.00, FALSE, NULL, NULL),
+  (65.00, FALSE, NULL, NULL),
+  (45.00, FALSE, NULL, NULL),
+  (30.00, FALSE, NULL, NULL),
+  (65.00, FALSE, NULL, NULL),
+  (50.00, FALSE, NULL, NULL);
+
+-- Agendamentos (barbeiro = 2, Junior; os quatro últimos são de 15/12/2026)
+INSERT INTO agendamento (horario_inicio, horario_fim, titulo, fk_status_agendamento, barbeiro, fk_cliente, fk_pagamento) VALUES
+  ('2026-10-08 09:00:00', '2026-10-08 09:30:00', 'Pedro Oliveira - Corte tradicional', 4, 2, 1, 1),
+  ('2026-10-09 10:00:00', '2026-10-09 10:20:00', 'João Ferreira - Barba',               4, 2, 2, 2),
+  ('2026-10-12 13:00:00', '2026-10-12 13:50:00', 'André Lima - Corte + barba',          4, 2, 3, 3),
+  ('2026-10-12 14:00:00', '2026-10-12 14:40:00', 'Bruno Martins - Degradê',             1, 2, 4, 4),
+  ('2026-10-10 11:00:00', '2026-10-10 11:30:00', 'Felipe Souza - Corte tradicional',    4, 2, 5, 5),
+  ('2026-10-11 15:00:00', '2026-10-11 15:50:00', 'Gustavo Rocha - Corte + barba',       4, 2, 6, 6),
+  ('2026-10-13 09:30:00', '2026-10-13 09:50:00', 'Matheus Ribeiro - Barba',             2, 2, 7, 7),
+  ('2026-10-14 16:00:00', '2026-10-14 16:50:00', 'Diego Carvalho - Corte + barba',      1, 2, 8, 8),
+  ('2026-12-15 09:00:00', '2026-12-15 09:30:00', 'Pedro Oliveira - Corte tradicional',  1, 2, 1, 9),
+  ('2026-12-15 10:00:00', '2026-12-15 10:20:00', 'João Ferreira - Barba',               1, 2, 2, 10),
+  ('2026-12-15 14:00:00', '2026-12-15 14:50:00', 'André Lima - Corte + barba',          1, 2, 3, 11),
+  ('2026-12-15 16:00:00', '2026-12-15 16:40:00', 'Bruno Martins - Degradê',             1, 2, 4, 12);
+
+INSERT INTO agendamento_servico (fk_agendamento, fk_servico, valor_unitario, duracao) VALUES
+  (1,  1, 45.00, 30),
+  (2,  2, 30.00, 20),
+  (3,  3, 65.00, 50),
+  (4,  4, 50.00, 40),
+  (5,  1, 45.00, 30),
+  (6,  3, 65.00, 50),
+  (6,  5, 15.00, 10),
+  (7,  2, 30.00, 20),
+  (8,  3, 65.00, 50),
+  (9,  1, 45.00, 30),
+  (10, 2, 30.00, 20),
+  (11, 3, 65.00, 50),
+  (12, 4, 50.00, 40);
+
+-- Expediente do Junior (dia_semana: 1 = segunda ... 7 = domingo)
+INSERT INTO expediente (dia_semana, fk_usuario, aberto, hora_abertura, hora_fechamento, intervalo_inicio, intervalo_fim) VALUES
+  (1, 2, TRUE,  '09:00:00', '18:00:00', '12:00:00', '13:00:00'),
+  (2, 2, TRUE,  '09:00:00', '18:00:00', '12:00:00', '13:00:00'),
+  (3, 2, TRUE,  '09:00:00', '18:00:00', '12:00:00', '13:00:00'),
+  (4, 2, TRUE,  '09:00:00', '18:00:00', '12:00:00', '13:00:00'),
+  (5, 2, TRUE,  '09:00:00', '18:00:00', '12:00:00', '13:00:00'),
+  (6, 2, TRUE,  '09:00:00', '14:00:00', NULL, NULL),
+  (7, 2, FALSE, NULL, NULL, NULL, NULL);
+
+INSERT INTO bloqueio (fk_usuario, inicio, fim, motivo) VALUES
+  (2, '2026-10-12 15:00:00', '2026-10-12 16:00:00', 'Compromisso pessoal'),
+  (2, '2026-10-13 12:00:00', '2026-10-13 13:00:00', 'Pausa excepcional');
+
+INSERT INTO despesa (fk_usuario, descricao, valor, data_despesa) VALUES
+  (1, 'Compra de lâminas e navalhas', 120.50, '2026-10-02'),
+  (1, 'Produtos para cabelo e barba', 245.90, '2026-10-05'),
+  (1, 'Manutenção de equipamento',    180.00, '2026-10-09'),
+  (2, 'Material de uso individual',    35.00, '2026-10-10');
