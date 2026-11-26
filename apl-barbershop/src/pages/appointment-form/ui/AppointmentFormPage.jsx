@@ -14,7 +14,7 @@ export default function AppointmentFormPage() {
 
   const initial = editing
     ? existing.data
-    : { date: params.get('data') ?? '', time: params.get('hora') ?? '', clientId: params.get('clienteId') ?? '' }
+    : { data: params.get('data') ?? '', hora: params.get('hora') ?? '', clienteId: params.get('clienteId') ?? '' }
 
   return (
     <AppLayout title={editing ? 'Editar agendamento' : 'Novo agendamento'} back>
@@ -26,7 +26,7 @@ export default function AppointmentFormPage() {
             key={initial.id ?? 'novo'}
             initial={initial}
             onCancel={() => navigate(-1)}
-            onSaved={(a) => navigate(`${ROUTES.schedule}?vista=dia&data=${a.startsAt.slice(0, 10)}`)}
+            onSaved={(a) => navigate(`${ROUTES.schedule}?vista=dia&data=${a.horarioInicio.slice(0, 10)}`)}
           />
         )}
       </div>

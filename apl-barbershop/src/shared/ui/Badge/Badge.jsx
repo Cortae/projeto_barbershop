@@ -2,7 +2,7 @@ import { Check, Clock, Ban } from 'lucide-react'
 
 const V = {
   neutral: 'bg-superficie-elevada border border-borda-campo text-texto',
-  paid: 'bg-sucesso text-fundo',
+  paid: 'bg-sucesso text-sobre-destaque',
   pending: 'border border-alerta text-alerta',
   blocked: 'hachura-info border border-info text-texto',
 }

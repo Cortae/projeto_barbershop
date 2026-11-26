@@ -1,23 +1,26 @@
 import { useNavigate } from 'react-router'
 import { Card } from '@/shared/ui'
-import { formatCurrency } from '@/shared/lib/format'
+import { formatMoney } from '@/shared/lib/format'
 import { ROUTES } from '@/shared/config'
+import { summarizeAppointments } from './model/summary'
+import { formatFinancialValue } from '@/features/finance/toggle-financial-values'
 
-export default function DaySummary({ appointments }) {
+export default function DaySummary({ appointments, valuesVisible = true }) {
   const navigate = useNavigate()
-  const received = appointments.filter((a) => a.paymentStatus === 'pago').reduce((s, a) => s + a.priceCents, 0)
-  const toReceive = appointments.filter((a) => a.status === 'agendado' || a.paymentStatus === 'pendente').reduce((s, a) => s + a.priceCents, 0)
+  const { received, toReceive } = summarizeAppointments(appointments)
+  const receivedLabel = formatFinancialValue(formatMoney(received), valuesVisible)
+  const toReceiveLabel = formatFinancialValue(formatMoney(toReceive), valuesVisible)
   return (
-    <Card onClick={() => navigate(ROUTES.finance)} chevron aria-label={`Hoje: recebido ${formatCurrency(received)}, a receber ${formatCurrency(toReceive)}. Abrir financeiro`}>
+    <Card onClick={() => navigate(ROUTES.finance)} chevron aria-label={`Hoje: recebido ${receivedLabel}, a receber ${toReceiveLabel}. Abrir financeiro`}>
       <h2 className="texto-h3">Hoje</h2>
       <div className="mt-3 grid grid-cols-2 gap-4">
         <div>
           <p className="texto-label text-texto-secundario">Recebido</p>
-          <p className="texto-kpi mt-1 text-sucesso">{formatCurrency(received)}</p>
+          <p className="texto-kpi mt-1 text-sucesso">{receivedLabel}</p>
         </div>
         <div>
           <p className="texto-label text-texto-secundario">A receber</p>
-          <p className="texto-kpi mt-1 text-alerta">{formatCurrency(toReceive)}</p>
+          <p className="texto-kpi mt-1 text-alerta">{toReceiveLabel}</p>
         </div>
       </div>
     </Card>

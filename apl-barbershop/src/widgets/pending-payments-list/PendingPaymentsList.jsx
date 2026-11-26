@@ -1,21 +1,22 @@
 import { useNavigate } from 'react-router'
 import { PartyPopper } from 'lucide-react'
 import { EmptyState } from '@/shared/ui'
-import { formatCurrency, formatDayMonth } from '@/shared/lib/format'
+import { formatMoney, formatDayMonth } from '@/shared/lib/format'
 import { ROUTES } from '@/shared/config'
 import { PaymentBadge } from '@/entities/payment'
 import { MarkAsPaidButton } from '@/features/appointment/mark-as-paid'
+import { formatFinancialValue } from '@/features/finance/toggle-financial-values'
 
-export default function PendingPaymentsList({ items }) {
+export default function PendingPaymentsList({ items, valuesVisible = true }) {
   const navigate = useNavigate()
-  const total = items.reduce((s, a) => s + a.priceCents, 0)
+  const total = items.reduce((s, a) => s + a.valor, 0)
   return (
     <section aria-labelledby="pendentes" className="flex flex-col gap-3">
       <div>
         <h2 id="pendentes" className="texto-h2">Pagamentos pendentes</h2>
         {items.length > 0 && (
           <p className="texto-corpo-pequeno mt-1 text-texto-secundario">
-            Falta receber {formatCurrency(total)} de {items.length} {items.length === 1 ? 'cliente' : 'clientes'}.
+            Falta receber {formatFinancialValue(formatMoney(total), valuesVisible)} de {items.length} {items.length === 1 ? 'cliente' : 'clientes'}.
           </p>
         )}
       </div>
@@ -33,12 +34,12 @@ export default function PendingPaymentsList({ items }) {
                 className="flex cursor-pointer flex-col gap-2 rounded-12 border border-borda bg-superficie p-4 hover:bg-superficie-elevada"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <span className="font-medium">{a.client.name} · {a.service.name}</span>
+                  <span className="font-medium">{a.cliente.nome} · {a.servicos.map((servico) => servico.nome).join(', ')}</span>
                   <PaymentBadge status="pendente" />
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <span className="texto-corpo-pequeno tabular-nums text-texto-secundario">
-                    {formatDayMonth(a.startsAt)} · <span className="texto-valor text-alerta">{formatCurrency(a.priceCents)}</span>
+                    {formatDayMonth(a.horarioInicio)} · <span className="texto-valor text-alerta">{formatFinancialValue(formatMoney(a.valor), valuesVisible)}</span>
                   </span>
                   <MarkAsPaidButton appointment={a} />
                 </div>

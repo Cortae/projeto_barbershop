@@ -12,14 +12,17 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src",
+    "test": "node --test src/entities/appointment/api/appointmentMapper.test.js",
     "lint:fix": "eslint src --fix",
     "format": "oxfmt src vite.config.ts",
     "format:check": "oxfmt --check src vite.config.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.2",
+    "chart.js": "^4.6.1",
     "lucide-react": "^1.55.0",
     "react": "^19.0.0",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.0.0",
     "react-router": "^8.4.0"
   },

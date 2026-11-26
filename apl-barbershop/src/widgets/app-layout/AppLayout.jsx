@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router'
 import { ChevronLeft, Plus } from 'lucide-react'
 import { Button } from '@/shared/ui'
+import { ThemeToggle } from '@/features/theme/switch-theme'
 import { NAV_ITEMS } from './navItems'
 import Logo from './Logo'
 import AvatarMenu from './AvatarMenu'
@@ -22,11 +23,11 @@ export default function AppLayout({ title, variant, back, menu, primaryAction, c
   const goBack = () => (typeof back === 'string' ? navigate(back) : navigate(-1))
 
   return (
-    <div className="min-h-dvh lg:pl-[184px]">
+    <div className="min-h-dvh lg:pl-[264px]">
       {/* Sidebar desktop */}
-      <aside className="fixed inset-y-0 left-0 hidden w-[184px] flex-col gap-6 border-r border-borda bg-superficie p-4 lg:flex">
-        <Logo />
-        <nav aria-label="Principal" className="flex flex-col gap-2">
+      <aside className="fixed inset-y-0 left-0 hidden w-[264px] flex-col gap-8 border-r border-borda bg-superficie p-6 lg:flex">
+        <div className="flex justify-center"><Logo sidebar /></div>
+        <nav aria-label="Principal" className="flex flex-col gap-3">
           {NAV_ITEMS.map(({ to, label, icon: Icon, match }) => {
             const active = match(pathname)
             return (
@@ -34,11 +35,11 @@ export default function AppLayout({ title, variant, back, menu, primaryAction, c
                 key={to}
                 to={to}
                 aria-current={active ? 'page' : undefined}
-                className={`texto-label flex min-h-11 items-center gap-3 rounded-8 px-3 ${
+                className={`flex min-h-14 items-center gap-4 rounded-12 px-4 text-base font-medium ${
                   active ? 'bg-secundaria font-semibold text-primaria' : 'text-texto-secundario hover:bg-superficie-elevada'
                 }`}
               >
-                <Icon className="size-6" aria-hidden /> {label}
+                <Icon className="size-7" aria-hidden /> {label}
               </NavLink>
             )
           })}
@@ -61,8 +62,11 @@ export default function AppLayout({ title, variant, back, menu, primaryAction, c
         </div>
         <div className="flex items-center gap-3">
           {primaryAction && (
-            <Button size="sm" icon={Plus} className="hidden lg:inline-flex" onClick={primaryAction.onClick}>{primaryAction.label}</Button>
+            <div className="hidden lg:block">
+              <Button size="sm" icon={Plus} onClick={primaryAction.onClick}>{primaryAction.label}</Button>
+            </div>
           )}
+          <ThemeToggle />
           {menu}
           <div className={variant === 'home' ? '' : 'hidden lg:block'}><AvatarMenu /></div>
           {!menu && variant !== 'home' && <div className="w-11 lg:hidden" />}
@@ -75,7 +79,7 @@ export default function AppLayout({ title, variant, back, menu, primaryAction, c
         <button
           type="button"
           onClick={primaryAction.onClick}
-          className="fixed bottom-20 right-4 z-30 flex h-14 items-center gap-2 rounded-full bg-primaria px-5 font-semibold text-fundo hover:bg-primaria-hover active:bg-primaria-pressionado lg:hidden"
+          className="fixed bottom-20 right-4 z-30 flex h-14 items-center gap-2 rounded-full bg-primaria px-5 font-semibold text-sobre-destaque hover:bg-primaria-hover active:bg-primaria-pressionado lg:hidden"
         >
           <Plus className="size-5" aria-hidden /> {primaryAction.label}
         </button>

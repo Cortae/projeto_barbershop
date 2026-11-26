@@ -17,7 +17,11 @@ export default function TodayAgenda({ appointments }) {
           icon={CalendarCheck}
           title="Agenda livre hoje"
           text={'Toque em "Novo agendamento" para marcar o primeiro corte.'}
-          action={<Button onClick={() => navigate(ROUTES.appointmentNew)}>Novo agendamento</Button>}
+          action={(
+            <div className="hidden lg:block">
+              <Button onClick={() => navigate(ROUTES.appointmentNew)}>Novo agendamento</Button>
+            </div>
+          )}
         />
       ) : (
         <ul className="flex flex-col gap-3">

@@ -1,59 +1,118 @@
 import { useQuery } from '@tanstack/react-query'
-import { db, request, nextId, ApiError } from '@/shared/api'
-import { findConflict } from '../model/conflict'
+import { ApiError, apiRequest } from '@/shared/api'
+import { mapAgendamentoResponse, mapAgendamentosResponse } from './appointmentMapper'
 
 export const appointmentKeys = {
   all: ['appointments'],
   range: (from, to) => ['appointments', 'range', from, to],
-  detail: (id) => ['appointments', id],
-  byClient: (clientId) => ['appointments', 'client', clientId],
+  detail: (id) => ['appointments', Number(id)],
+  byClient: (clientId) => ['appointments', 'client', Number(clientId)],
+  byBarber: (barberId) => ['appointments', 'barber', Number(barberId)],
 }
 
-const withRefs = (a) => ({
-  ...a,
-  client: db.clients.find((c) => c.id === a.clientId),
-  service: db.services.find((s) => s.id === a.serviceId),
+const positiveInteger = (value, field) => {
+  const parsed = Number(value)
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new ApiError('invalid_payload', `${field} deve ser um número inteiro positivo.`)
+  }
+  return parsed
+}
+
+const serviceIds = (values) => {
+  if (!Array.isArray(values) || !values.length) {
+    throw new ApiError('invalid_payload', 'Selecione ao menos um serviço.')
+  }
+  return values.map((value) => positiveInteger(value, 'servicos'))
+}
+
+const mapOne = (request) => request.then(mapAgendamentoResponse)
+const mapMany = (request) => request.then(mapAgendamentosResponse)
+
+export const fetchAppointments = (from, to) =>
+  mapMany(apiRequest(`/agendamentos/periodo?de=${encodeURIComponent(from)}&ate=${encodeURIComponent(to)}`))
+
+export const fetchAppointment = (id) =>
+  mapOne(apiRequest(`/agendamentos/${positiveInteger(id, 'idAgendamento')}`))
+
+export const fetchClientAppointments = (clientId) =>
+  mapMany(apiRequest(`/agendamentos/cliente/${positiveInteger(clientId, 'clienteId')}`))
+
+export const buscarPorBarbeiro = (barbeiroId) =>
+  mapMany(apiRequest(`/agendamentos/barbeiro/${positiveInteger(barbeiroId, 'barbeiroId')}`))
+
+export const createAppointment = ({ barbeiroId = 2, clienteId, servicos, horarioInicio }) =>
+  mapOne(apiRequest('/agendamentos', {
+    method: 'POST',
+    body: JSON.stringify({
+      barbeiro: positiveInteger(barbeiroId, 'barbeiro'),
+      cliente: positiveInteger(clienteId, 'cliente'),
+      servicos: serviceIds(servicos),
+      inicio: horarioInicio,
+    }),
+  }))
+
+export const editAppointment = ({ id, clienteId, servicos, horarioInicio }) =>
+  mapOne(apiRequest(`/agendamentos/${positiveInteger(id, 'idAgendamento')}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      cliente: positiveInteger(clienteId, 'cliente'),
+      servicos: serviceIds(servicos),
+      inicio: horarioInicio,
+    }),
+  }))
+
+export const saveAppointment = (appointment) =>
+  appointment.id ? editAppointment(appointment) : createAppointment(appointment)
+
+export const cancelAppointment = (id) =>
+  mapOne(apiRequest(`/agendamentos/cancelar/${positiveInteger(id, 'idAgendamento')}`, { method: 'PATCH' }))
+
+export const completeAppointment = (id, formaPagamentoId = null) =>
+  mapOne(apiRequest(`/agendamentos/concluir/${positiveInteger(id, 'idAgendamento')}`, {
+    method: 'PATCH',
+    ...(formaPagamentoId
+      ? { body: JSON.stringify({ formaPagamentoId: positiveInteger(formaPagamentoId, 'formaPagamentoId') }) }
+      : {}),
+  }))
+
+export const markAppointmentPaid = (id, formaPagamentoId) =>
+  mapOne(apiRequest('/agendamentos/pagar', {
+    method: 'PATCH',
+    body: JSON.stringify({
+      idAgendamento: positiveInteger(id, 'idAgendamento'),
+      formaPagamentoId: positiveInteger(formaPagamentoId, 'formaPagamentoId'),
+    }),
+  }))
+
+export const remarcarAgendamento = ({ idAgendamento, inicio }) =>
+  mapOne(apiRequest('/agendamentos/horario', {
+    method: 'PATCH',
+    body: JSON.stringify({ idAgendamento: positiveInteger(idAgendamento, 'idAgendamento'), inicio }),
+  }))
+
+export const atualizarServicosAgendamento = ({ idAgendamento, servicos }) =>
+  mapOne(apiRequest('/agendamentos/servicos', {
+    method: 'PATCH',
+    body: JSON.stringify({
+      idAgendamento: positiveInteger(idAgendamento, 'idAgendamento'),
+      servicos: serviceIds(servicos),
+    }),
+  }))
+
+export const useAppointments = (from, to) => useQuery({
+  queryKey: appointmentKeys.range(from, to),
+  queryFn: () => fetchAppointments(from, to),
+  enabled: Boolean(from && to),
 })
 
-/** Intervalo de datas inclusivo (YYYY-MM-DD). */
-export const fetchAppointments = (from, to) =>
-  request(() =>
-    db.appointments
-      .filter((a) => a.status !== 'cancelado' && a.startsAt.slice(0, 10) >= from && a.startsAt.slice(0, 10) <= to)
-      .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
-      .map(withRefs),
-  )
-export const fetchAppointment = (id) => request(() => withRefs(db.appointments.find((a) => a.id === id)))
-export const fetchClientAppointments = (clientId) =>
-  request(() => db.appointments.filter((a) => a.clientId === clientId && a.status === 'concluido').sort((a, b) => b.startsAt.localeCompare(a.startsAt)).map(withRefs))
+export const useAppointment = (id) => useQuery({
+  queryKey: appointmentKeys.detail(id),
+  queryFn: () => fetchAppointment(id),
+  enabled: Boolean(id),
+})
 
-export const saveAppointment = (data) =>
-  request(() => {
-    const service = db.services.find((s) => s.id === data.serviceId)
-    const payload = { ...data, priceCents: service.priceCents, durationMin: service.durationMin }
-    if (findConflict({ ...payload, ignoreId: data.id }, db.appointments, db.blocks))
-      throw new ApiError('conflict', 'Esse horário já está ocupado. Escolha outro horário livre.')
-    if (data.id) {
-      Object.assign(db.appointments.find((a) => a.id === data.id), payload)
-      return withRefs(payload)
-    }
-    const a = { ...payload, id: nextId('a'), status: 'agendado' }
-    db.appointments.push(a)
-    return withRefs(a)
-  })
-
-const patch = (id, changes) =>
-  request(() => {
-    const a = db.appointments.find((x) => x.id === id)
-    Object.assign(a, changes)
-    return withRefs(a)
-  })
-export const cancelAppointment = (id) => patch(id, { status: 'cancelado' })
-export const completeAppointment = (id, { paymentStatus, paymentMethod }) =>
-  patch(id, { status: 'concluido', paymentStatus, paymentMethod: paymentStatus === 'pago' ? paymentMethod : undefined })
-export const markAppointmentPaid = (id) => patch(id, { paymentStatus: 'pago' })
-
-export const useAppointments = (from, to) => useQuery({ queryKey: appointmentKeys.range(from, to), queryFn: () => fetchAppointments(from, to) })
-export const useAppointment = (id) => useQuery({ queryKey: appointmentKeys.detail(id), queryFn: () => fetchAppointment(id), enabled: !!id })
-export const useClientAppointments = (clientId) =>
-  useQuery({ queryKey: appointmentKeys.byClient(clientId), queryFn: () => fetchClientAppointments(clientId), enabled: !!clientId })
+export const useClientAppointments = (clientId) => useQuery({
+  queryKey: appointmentKeys.byClient(clientId),
+  queryFn: () => fetchClientAppointments(clientId),
+  enabled: Boolean(clientId),
+})

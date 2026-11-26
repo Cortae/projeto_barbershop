@@ -1,5 +1,6 @@
 export const ROUTES = {
   login: '/login',
+  recoverPassword: '/recuperar-senha',
   home: '/',
   schedule: '/agenda',
   appointmentNew: '/agendamentos/novo',

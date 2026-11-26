@@ -1,14 +1,16 @@
 import { Navigate } from 'react-router'
 import { useSession } from '@/entities/barber'
-import { GoogleSignInButton } from '@/features/auth/sign-in-google'
+import { CredentialsSignInForm } from '@/features/auth/sign-in-credentials'
 import { Logo } from '@/widgets/app-layout'
 import { ROUTES } from '@/shared/config'
+import { ThemeToggle } from '@/features/theme/switch-theme'
 
 export default function LoginPage() {
   const session = useSession()
   if (session) return <Navigate to={ROUTES.home} replace />
   return (
     <main className="flex min-h-dvh flex-col bg-fundo px-4 lg:items-center lg:justify-center">
+      <div className="fixed right-4 top-4 z-10"><ThemeToggle /></div>
       <div className="relative flex flex-1 flex-col justify-between py-12 lg:w-full lg:max-w-md lg:flex-none lg:rounded-12 lg:border lg:border-borda lg:bg-superficie lg:p-8">
         <div
           aria-hidden
@@ -16,15 +18,17 @@ export default function LoginPage() {
           style={{ background: 'radial-gradient(60% 60% at 50% 0%, color-mix(in srgb, var(--color-primaria) 35%, transparent), transparent)' }}
         />
         <div className="relative flex flex-col gap-12 pt-12 lg:pt-0">
-          <Logo large />
+          <div className="flex justify-center">
+            <Logo large />
+          </div>
           <div>
             <h1 className="texto-h1">Entrar na JR Barbershop</h1>
             <p className="mt-3 text-texto-secundario">Sua agenda e seu caixa em um só lugar.</p>
           </div>
         </div>
         <div className="relative mt-12">
-          <GoogleSignInButton />
-          <p className="texto-corpo-pequeno mt-4 text-center text-texto-secundario">Acesso restrito ao barbeiro.</p>
+          <CredentialsSignInForm />
+          <p className="texto-corpo-pequeno mt-4 text-center text-texto-secundario">Acesso restrito a administradores.</p>
         </div>
       </div>
     </main>

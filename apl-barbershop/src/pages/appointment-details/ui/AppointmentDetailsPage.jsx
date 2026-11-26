@@ -7,14 +7,14 @@ import { MarkAsPaidButton } from '@/features/appointment/mark-as-paid'
 import { useAppointment, AppointmentStatusBadge } from '@/entities/appointment'
 import { PaymentBadge, methodLabel } from '@/entities/payment'
 import { Card, Skeleton, ErrorState } from '@/shared/ui'
-import { formatCurrency, formatDayMonth, formatTime } from '@/shared/lib/format'
+import { formatMoney, formatDayMonth, formatTime } from '@/shared/lib/format'
 import { ROUTES } from '@/shared/config'
 
 export default function AppointmentDetailsPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { data: a, isLoading, isError, refetch } = useAppointment(id)
-  const toSchedule = () => navigate(`${ROUTES.schedule}?vista=dia&data=${a.startsAt.slice(0, 10)}`)
+  const toSchedule = () => navigate(`${ROUTES.schedule}?vista=dia&data=${a.horarioInicio.slice(0, 10)}`)
 
   return (
     <AppLayout title="Detalhe do agendamento" back>
@@ -25,16 +25,20 @@ export default function AppointmentDetailsPage() {
           <>
             <Card className="flex flex-col gap-3">
               <div className="flex flex-wrap items-center gap-2">
-                <button className="texto-h2 mr-auto text-left hover:underline" onClick={() => navigate(ROUTES.client(a.clientId))}>{a.client.name}</button>
+                <button className="texto-h2 mr-auto text-left hover:underline" onClick={() => navigate(ROUTES.client(a.clienteId))}>{a.cliente.nome}</button>
                 <AppointmentStatusBadge status={a.status} />
-                <PaymentBadge status={a.paymentStatus} />
+                <PaymentBadge status={a.statusPagamento} />
               </div>
+              <ul className="text-texto-secundario">
+                {a.servicos.map((servico) => (
+                  <li key={servico.id}>{servico.nome} · {servico.duracaoMinutos} min · {formatMoney(servico.valor)}</li>
+                ))}
+              </ul>
               <p className="text-texto-secundario tabular-nums">
-                {a.service.name} · {formatDayMonth(a.startsAt)} às {formatTime(a.startsAt)} · {a.durationMin} min
+                {formatDayMonth(a.horarioInicio)} às {formatTime(a.horarioInicio)} · {a.duracaoMinutos} min
               </p>
-              <p className="texto-kpi">{formatCurrency(a.priceCents)}</p>
-              {a.paymentMethod && <p className="texto-corpo-pequeno text-texto-secundario">Forma de pagamento: {methodLabel(a.paymentMethod)}</p>}
-              {a.notes && <p className="texto-corpo-pequeno rounded-8 bg-superficie-elevada p-3">{a.notes}</p>}
+              <p className="texto-kpi">{formatMoney(a.valor)}</p>
+              {a.formaPagamento && <p className="texto-corpo-pequeno text-texto-secundario">Forma de pagamento: {methodLabel(a.formaPagamento)}</p>}
             </Card>
 
             {a.status === 'agendado' && (
@@ -44,7 +48,7 @@ export default function AppointmentDetailsPage() {
                 <CancelAppointmentButton appointmentId={a.id} onDone={toSchedule} />
               </div>
             )}
-            {a.status === 'concluido' && a.paymentStatus === 'pendente' && <MarkAsPaidButton appointment={a} size="md" full />}
+            {a.status === 'concluido' && a.statusPagamento === 'pendente' && <MarkAsPaidButton appointment={a} size="md" full />}
           </>
         )}
       </div>

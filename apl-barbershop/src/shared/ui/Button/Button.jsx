@@ -1,10 +1,10 @@
 import { Loader2 } from 'lucide-react'
 
 const VARIANTS = {
-  primary: 'bg-primaria text-fundo hover:bg-primaria-hover active:bg-primaria-pressionado',
+  primary: 'bg-primaria text-sobre-destaque hover:bg-primaria-hover active:bg-primaria-pressionado',
   secondary: 'bg-secundaria text-primaria-hover hover:ring-1 hover:ring-primaria-hover active:bg-superficie-elevada',
   'danger-outline': 'border-2 border-erro text-erro hover:bg-superficie-elevada active:bg-superficie',
-  danger: 'bg-erro text-fundo hover:ring-2 hover:ring-texto',
+  danger: 'bg-erro text-sobre-destaque hover:ring-2 hover:ring-texto',
   link: 'text-primaria font-medium hover:underline px-0',
   icon: 'border border-borda-campo text-texto hover:bg-superficie-elevada',
 }

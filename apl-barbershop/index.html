@@ -7,8 +7,22 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta property="og:title" content="JR Barbershop" />
     <meta property="og:description" content="Sistema de gestão de agenda, clientes, serviços e finanças da JR Barbershop." />
-    <link rel="icon" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <title>JR Barbershop</title>
+    <script>
+      (() => {
+        try {
+          const saved = localStorage.getItem('jr-theme')
+          const theme = saved === 'light' || saved === 'dark'
+            ? saved
+            : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          document.documentElement.dataset.theme = theme
+          document.documentElement.style.colorScheme = theme
+        } catch {
+          document.documentElement.dataset.theme = 'dark'
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

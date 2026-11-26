@@ -3,6 +3,7 @@ import { CalendarPlus } from 'lucide-react'
 import { AppLayout } from '@/widgets/app-layout'
 import { ClientHistory } from '@/widgets/client-history'
 import { ClientForm } from '@/features/client/upsert-client'
+import { DeleteClientButton } from '@/features/client/delete-client'
 import { useClient } from '@/entities/client'
 import { Button, SkeletonList, ErrorState } from '@/shared/ui'
 import { ROUTES } from '@/shared/config'
@@ -18,7 +19,7 @@ export default function ClientPage() {
     fromAppointment ? navigate(`${ROUTES.appointmentNew}?clienteId=${c.id}`, { replace: true }) : navigate(ROUTES.clients)
 
   return (
-    <AppLayout title={id ? data?.name ?? 'Cliente' : 'Novo cliente'} back>
+    <AppLayout title={id ? data?.nome ?? 'Cliente' : 'Novo cliente'} back>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <section aria-labelledby="dados-cliente" className="flex flex-col gap-4">
           <h2 id="dados-cliente" className="texto-h2 hidden lg:block">Dados do cliente</h2>
@@ -28,8 +29,9 @@ export default function ClientPage() {
         </section>
         {id && data && (
           <div className="flex flex-col gap-4">
-            <ClientHistory clientId={id} />
+            <ClientHistory clienteId={id} />
             <Button variant="secondary" icon={CalendarPlus} onClick={() => navigate(`${ROUTES.appointmentNew}?clienteId=${id}`)}>Agendar corte</Button>
+            <DeleteClientButton client={data} onDeleted={() => navigate(ROUTES.clients, { replace: true })} />
           </div>
         )}
       </div>

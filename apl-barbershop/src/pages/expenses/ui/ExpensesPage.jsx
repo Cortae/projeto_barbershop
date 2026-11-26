@@ -12,7 +12,7 @@ export default function ExpensesPage() {
   const [month] = useMonthParam()
   const [open, setOpen] = useState(false)
   const { data, isLoading, isError, refetch } = useExpenses(month)
-  const total = data?.reduce((s, e) => s + e.amountCents, 0) ?? 0
+  const total = data?.reduce((s, e) => s + e.valorCentavos, 0) ?? 0
   return (
     <AppLayout title="Despesas" back={`${ROUTES.finance}?periodo=${month}`} primaryAction={{ label: 'Nova despesa', onClick: () => setOpen(true) }}>
       <div className="mx-auto flex max-w-2xl flex-col gap-4">
